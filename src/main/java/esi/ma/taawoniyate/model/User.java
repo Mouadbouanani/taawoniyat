@@ -1,39 +1,64 @@
 package esi.ma.taawoniyate.model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+//import jakarta.persistence.Entity;
+//import jakarta.persistence.GeneratedValue;
+//import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
-public class User {
+@Table(name = "users")
+public abstract class User {
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private int id ;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id ;
+    @Column
     private String fullName ;
+    @Column
     private String email ;
-    private String phone ;
+    @Column
     private String region ;
+    @Column
     private String password ;
+    @Column
     private String city;
+    @Column
     private String Address;
+    @Column(name = "phone")
+    private String phone;
+    @Column
+    private String role; // client, admin, seller
 
-    public User(int id, String fullName, String email, String phone, String region, String password, String city, String address) {
+    public User(long id, String fullName, String email, String region, String password, String city, String address, String phone, String role) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
-        this.phone = phone;
         this.region = region;
         this.password = password;
         this.city = city;
         Address = address;
+        this.phone = phone;
+        this.role = role;
     }
-    public User(){}
-    public int getId() {
+
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public User(){
+
+    }
+
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -51,14 +76,6 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public String getRegion() {
@@ -91,5 +108,13 @@ public class User {
 
     public void setAddress(String address) {
         Address = address;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
