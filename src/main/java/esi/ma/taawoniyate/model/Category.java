@@ -14,15 +14,14 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="name",nullable = false, unique = true)
+    @Column(name="name", nullable = false, unique = true)
     private String name;
 
-    public Category(){
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    private List<Product> products = new ArrayList<>();
 
+    public Category() {
     }
-    @OneToMany
-    @JoinColumn(name="category", nullable=false)
-    private ArrayList<Product> products;
 
     public long getId() {
         return id;
@@ -40,11 +39,11 @@ public class Category {
         this.name = name;
     }
 
-    public List<Product> getProduits() {
+    public List<Product> getProducts() {
         return products;
     }
 
-    public void setProduits(ArrayList<Product> produits) {
-        this.products = produits;
+    public void setProducts(List<Product> products) {
+        this.products = products;
     }
 }

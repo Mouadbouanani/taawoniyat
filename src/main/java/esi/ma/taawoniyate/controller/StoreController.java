@@ -2,8 +2,10 @@ package esi.ma.taawoniyate.controller;
 
 import esi.ma.taawoniyate.model.Category;
 import esi.ma.taawoniyate.model.Product;
+import esi.ma.taawoniyate.model.Seller;
 import esi.ma.taawoniyate.repository.CategoryRepository;
 import esi.ma.taawoniyate.repository.ProductRepository;
+import esi.ma.taawoniyate.repository.SellerRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,9 @@ public class StoreController {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private SellerRepository sellerRepository;
 
     // Get all products
     @GetMapping("/products")
@@ -58,9 +63,38 @@ public class StoreController {
     }
 
     @PostMapping("/addProduct")
-    public ResponseEntity<Product> addProduct(@RequestBody Product product) {
-        productRepository.save(product);
-        return ResponseEntity.ok(product);
+    public ResponseEntity<?> addProduct(@RequestBody Product product) {
+        // Validate required fields
+        if (product.getName() == null || product.getName().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Product name cannot be null or empty");
+        }
+        
+        if (product.getSeller() == null) {
+            return ResponseEntity.badRequest().body("Seller information is required");
+        }
+
+        if (product.getCategory() == null) {
+            return ResponseEntity.badRequest().body("Category information is required");
+        }
+
+        // Verify seller exists
+        Seller seller = sellerRepository.findById((int)product.getSeller().getId()).orElse(null);
+        if (seller == null) {
+            return ResponseEntity.badRequest().body("Seller not found with id: " + product.getSeller().getId());
+        }
+
+        // Verify category exists
+        Category category = categoryRepository.findById(product.getCategory().getId()).orElse(null);
+        if (category == null) {
+            return ResponseEntity.badRequest().body("Category not found with id: " + product.getCategory().getId());
+        }
+
+        try {
+            Product savedProduct = productRepository.save(product);
+            return ResponseEntity.ok(savedProduct);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error saving product: " + e.getMessage());
+        }
     }
 
     @PostMapping("/addCategory")
