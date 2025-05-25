@@ -7,6 +7,7 @@ import esi.ma.taawoniyate.repository.CategoryRepository;
 import esi.ma.taawoniyate.repository.ProductRepository;
 import esi.ma.taawoniyate.repository.SellerRepository;
 
+import esi.ma.taawoniyate.service.SellerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,8 @@ public class StoreController {
 
     @Autowired
     private SellerRepository sellerRepository;
+    @Autowired
+    private SellerService sellerService;
 
     // Get all products
     @GetMapping("/products")
@@ -127,6 +130,11 @@ public class StoreController {
 
         categoryRepository.delete(category);
         return ResponseEntity.ok("Deleted category named: " + name);
+    }
+    @GetMapping("/{busnissName}/products")
+    public List<Product> getBusnissNameProducts(@PathVariable String busnissName) {
+        List<Product> products = sellerService.getProductsByBusinessName(busnissName);
+        return products;
     }
 
 
