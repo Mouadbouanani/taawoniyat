@@ -1,6 +1,5 @@
 package esi.ma.taawoniyate.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,14 +14,15 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="name", nullable = false, unique = true)
+    @Column(name="name",nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    private List<Product> products = new ArrayList<>();
+    public Category(){
 
-    public Category() {
     }
+    @OneToMany
+    @JoinColumn(name="category", nullable=false)
+    private ArrayList<Product> products;
 
     public long getId() {
         return id;
@@ -40,11 +40,11 @@ public class Category {
         this.name = name;
     }
 
-    public List<Product> getProducts() {
+    public List<Product> getProduits() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public void setProduits(ArrayList<Product> produits) {
+        this.products = produits;
     }
 }

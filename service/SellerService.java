@@ -17,15 +17,19 @@ import java.util.Optional;
 @Service
 @Transactional
 public class SellerService {
+
     @Autowired
     private SellerRepository sellerRepository;
+
     @Cacheable(value = "sellers", key = "#id")
     public Optional<Seller> findById(Integer id) {
         return sellerRepository.findById(id);
     }
+
     public Page<Seller> findAll(Pageable pageable) {
         return sellerRepository.findAll(pageable);
     }
+
     @Transactional
     @CacheEvict(value = {"sellers", "clients", "users"}, key = "#seller.id")
     public Seller save(Seller seller) {
@@ -34,6 +38,7 @@ public class SellerService {
         }
         return sellerRepository.save(seller);
     }
+
     @Transactional
     @CacheEvict(value = {"sellers", "clients", "users"}, key = "#seller.id")
     public Seller update(Seller seller) {

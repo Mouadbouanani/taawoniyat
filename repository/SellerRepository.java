@@ -8,5 +8,4 @@ public interface SellerRepository extends JpaRepository<Seller, Integer> {
 //    Seller findByProducts(String products);
 //    Seller findByProductId(int productId);
 //    Seller findByUserId(long userId);
-    Seller findSelllerByBusinessName(String businessName);
 }

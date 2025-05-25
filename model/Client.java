@@ -6,12 +6,7 @@ import java.util.List;
 
 @Entity
 public class Client extends User {
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "users_produit_favoris",
-            joinColumns = @JoinColumn(name = "client_id"),
-            inverseJoinColumns = @JoinColumn(name = "produit_favoris_product_id")
-    )
+    @OneToMany
     public List<Product> produitFavoris;
 
 

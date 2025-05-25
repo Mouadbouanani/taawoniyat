@@ -1,8 +1,10 @@
 package esi.ma.taawoniyate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,10 +37,13 @@ public class Product {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="seller_id", nullable= false)
+    @JsonIgnore
     private Seller seller;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<PanierItem> panierItems;
+
+
 
     public Product() {
     }
@@ -51,8 +56,8 @@ public class Product {
         this.id = id;
     }
 
-    public Category getCategory() {
-        return category;
+    public String getCategory() {
+        return category.getName();
     }
 
     public void setCategory(Category category) {
@@ -91,7 +96,9 @@ public class Product {
         this.quantity = quantity;
     }
 
-    public List<ProductImage> getImages() {
+    public List<String> getImages() {
+        List<String> images = new ArrayList<>();
+        this.images.forEach(image -> images.add(image.getImageUrl()));
         return images;
     }
 
@@ -99,8 +106,8 @@ public class Product {
         this.images = images;
     }
 
-    public Seller getSeller() {
-        return seller;
+    public String getSeller() {
+        return seller.getBusinessName();
     }
 
     public void setSeller(Seller seller) {
