@@ -2,6 +2,7 @@ package esi.ma.taawoniyate.controller;
 
 import esi.ma.taawoniyate.model.Client;
 import esi.ma.taawoniyate.model.Panier;
+import esi.ma.taawoniyate.model.PanierItem;
 import esi.ma.taawoniyate.model.Product;
 import esi.ma.taawoniyate.model.User;
 import esi.ma.taawoniyate.service.ClientService;
@@ -28,6 +29,13 @@ public class PanierController {
             return ResponseEntity.status(401).body("User not logged in");
         }
         panier.setClient(currentUser);
+        // Set client for each PanierItem
+        if (panier.getItems() != null) {
+            for (PanierItem item : panier.getAllItems()) {
+                item.setClient(currentUser);
+                item.setPanier(panier);
+            }
+        }
         panierService.savePanier(panier);
         return ResponseEntity.ok("Panier enregistré avec succès !");
     }

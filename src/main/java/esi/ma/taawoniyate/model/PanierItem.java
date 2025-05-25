@@ -1,6 +1,7 @@
 package esi.ma.taawoniyate.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
 
@@ -60,8 +61,9 @@ public class PanierItem {
         this.price = price;
     }
 
-    public Panier getPanier() {
-        return panier;
+    @JsonIgnore
+    public String getPanier() {
+        return String.valueOf(panier.getPanier_id());
     }
 
     public void setPanier(Panier panier) {
@@ -84,6 +86,7 @@ public class PanierItem {
         this.seller = seller;
     }
 
+    @JsonIgnore
     public Client getClient() {
         return client;
     }
