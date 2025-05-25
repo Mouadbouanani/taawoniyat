@@ -33,6 +33,11 @@ public class UserController {
     @Autowired
     private HttpSession session;
 
+
+    public HttpSession getSession() {
+        return session;
+    }
+
     @GetMapping
     public ResponseEntity<Page<User>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
@@ -169,8 +174,7 @@ public class UserController {
             
             // Initialize empty lists
             client.setProduitFavoris(new ArrayList<>());
-            client.setPanierItems(new ArrayList<>());
-            
+
             // Save the client
             Client registeredClient = (Client) userService.save(client);
             
@@ -219,7 +223,6 @@ public class UserController {
             
             // Initialize empty lists
             seller.setProduitFavoris(new ArrayList<>());
-            seller.setPanierItems(new ArrayList<>());
             seller.setProducts(new ArrayList<>());
             
             // Save the seller
