@@ -14,8 +14,14 @@ public class Seller extends Client{
     private String businessName;
 
     public Seller() {
-    super();
-    this.setRole("seller");
+        super();
+        this.setRole("seller");
+    }
+
+    public Seller(String fullName, String email, String region, String password, String city, String address, String phone, String businessName) {
+        super(fullName, email, region, password, city, address, phone);
+        this.setRole("seller");
+        this.businessName = businessName;
     }
 
     public List<Product> getProducts() {

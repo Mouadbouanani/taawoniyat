@@ -102,6 +102,9 @@ public class Product {
     public Seller getSeller() {
         return seller;
     }
+    public String getSellerFullName() {
+        return seller.getFullName();
+    }
 
     public void setSeller(Seller seller) {
         this.seller = seller;
