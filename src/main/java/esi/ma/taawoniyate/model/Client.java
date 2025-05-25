@@ -9,18 +9,19 @@ public class Client extends User {
     @OneToMany
     public List<Product> produitFavoris;
 
-
-
     @OneToOne(mappedBy = "client", cascade = CascadeType.ALL)
     private Panier panier;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<PanierItem> panierItems;
 
-
     public Client() {
         super();
         this.setRole("client");
+    }
+
+    public Client(String fullName, String email, String region, String password, String city, String address, String phone) {
+        super(fullName, email, region, password, city, address, phone, "client");
     }
 
     public List<Product> getProduitFavoris() {
@@ -29,9 +30,6 @@ public class Client extends User {
 
     public void setProduitFavoris(List<Product> produitFavoris) {
         this.produitFavoris = produitFavoris;
-    }
-    public Client(long id, String fullName, String email, String region, String password, String city, String address, String phone, String role) {
-        super(id, fullName, email, region, password, city, address, phone, role);
     }
 
     public Panier getPanier() {
