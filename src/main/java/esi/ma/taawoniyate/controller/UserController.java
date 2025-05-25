@@ -1,10 +1,12 @@
 package esi.ma.taawoniyate.controller;
 
 import esi.ma.taawoniyate.model.Client;
+import esi.ma.taawoniyate.model.Product;
 import esi.ma.taawoniyate.model.Seller;
 import esi.ma.taawoniyate.model.User;
 import esi.ma.taawoniyate.repository.UserRepository;
 import esi.ma.taawoniyate.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +30,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private HttpSession session;
 
     @GetMapping
     public ResponseEntity<Page<User>> getAllUsers(
@@ -99,6 +103,8 @@ public class UserController {
                 response.put("success", true);
                 response.put("message", "Authentication successful");
                 response.put("user", user);
+                session.setAttribute("user", user);
+                session.setAttribute("id", user.getId());
                 return ResponseEntity.ok(response);
             } else {
                 response.put("success", false);
@@ -109,6 +115,15 @@ public class UserController {
             response.put("success", false);
             response.put("message", "Authentication failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    @GetMapping("/me")
+    public ResponseEntity<User> getCurrentUser() {
+        if (session.getAttribute("user") != null) {
+            User user = (User) session.getAttribute("user");
+            return ResponseEntity.ok(user);
+        }else {
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -220,6 +235,27 @@ public class UserController {
             response.put("message", "Registration failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+
+    }
+    @GetMapping("/me/favorites")
+    public ResponseEntity<Map<String, Object>> getFavoriteProducts() {
+        Map<String, Object> response = new HashMap<>();
+
+        // Get the authenticated user from the session
+        User user = (User) session.getAttribute("user");
+        if (user == null || !(user instanceof Client)) {
+            response.put("success", false);
+            response.put("message", "User not authenticated or not a client");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        Client client = (Client) user;
+        List<Product> favorites = client.getProduitFavoris() != null ? client.getProduitFavoris() : new ArrayList<>();
+
+        response.put("success", true);
+        response.put("message", "Favorite products retrieved successfully");
+        response.put("favorites", favorites);
+        return ResponseEntity.ok(response);
     }
 
     // Inner class for authentication request
