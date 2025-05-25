@@ -61,7 +61,7 @@ export default function AccountScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Image
-          source={require('../assets/images/partial-react-logo.png')}
+          source={require('@/assets/images/icon.png')}
           style={styles.avatar}
         />
         <Text style={styles.name}>{user.fullName}</Text>
