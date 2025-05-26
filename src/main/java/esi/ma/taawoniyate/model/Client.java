@@ -16,11 +16,10 @@ public class Client extends User {
 
 
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    private Panier panier;
+    @OneToMany (mappedBy = "client", cascade = CascadeType.ALL)
+    private List<Panier> paniers;
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    private List<PanierItem> panierItems;
+
 
 
     public Client() {
@@ -39,19 +38,11 @@ public class Client extends User {
 //        super(id, fullName, email, region, password, city, address, phone, role);
 //    }
 
-    public Panier getPanier() {
-        return panier;
+    public List<Panier> getPaniers() {
+        return paniers;
     }
 
-    public void setPanier(Panier panier) {
-        this.panier = panier;
-    }
-
-    public List<PanierItem> getPanierItems() {
-        return panierItems;
-    }
-
-    public void setPanierItems(List<PanierItem> panierItems) {
-        this.panierItems = panierItems;
+    public void setPaniers(List<Panier> paniers) {
+        this.paniers = paniers;
     }
 }

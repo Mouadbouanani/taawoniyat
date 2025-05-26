@@ -1,7 +1,6 @@
 package esi.ma.taawoniyate.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -25,8 +24,6 @@ public class Panier {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
-
-    // methode calculTotalAmount
 
     public Panier() {
         this.date = LocalDateTime.now();
