@@ -1,9 +1,7 @@
 package esi.ma.taawoniyate.controller;
 
-import esi.ma.taawoniyate.model.Client;
-import esi.ma.taawoniyate.model.Product;
-import esi.ma.taawoniyate.model.ProductImage;
-import esi.ma.taawoniyate.model.User;
+import esi.ma.taawoniyate.model.*;
+import esi.ma.taawoniyate.repository.CategoryRepository;
 import esi.ma.taawoniyate.repository.ProductImageRepository;
 import esi.ma.taawoniyate.repository.ProductRepository;
 import esi.ma.taawoniyate.repository.UserRepository;
@@ -20,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin(origins = "http://localhost:8081",allowCredentials = "true")
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
@@ -30,17 +28,19 @@ public class ProductController {
     private final ProductImageRepository productImageRepository;
     private final UserRepository userRepository;
     private final HttpSession session;
+    private final CategoryRepository categoryRepository;
 
     public ProductController(CloudinaryService cloudinaryService,
                              ProductRepository productRepository,
                              ProductImageRepository productImageRepository,
                              UserRepository userRepository,
-                             HttpSession session) {
+                             HttpSession session, CategoryRepository categoryRepository) {
         this.cloudinaryService = cloudinaryService;
         this.productRepository = productRepository;
         this.productImageRepository = productImageRepository;
         this.userRepository = userRepository;
         this.session = session;
+        this.categoryRepository = categoryRepository;
     }
 
     @PostMapping("/{id}/upload-image")
