@@ -42,16 +42,16 @@ export function ProductCard({ id, name, description, price, images, onAddToCart,
       ) : (
         <View style={styles.placeholderImage}><ThemedText>No Image</ThemedText></View>
       )}
-      <TouchableOpacity
+      <TouchableOpacity 
         style={styles.favoriteButton}
         // Call onToggleFavorite and pass the product data
         onPress={() => onToggleFavorite(productToAdd)}
       >
-        <Ionicons
+        <Ionicons 
           // Use the isFavorite prop to determine the icon
-          name={isFavorite ? "heart" : "heart-outline"}
-          size={24}
-          color={isFavorite ? "#ff4646" : "#666"}
+          name={isFavorite ? "heart" : "heart-outline"} 
+          size={24} 
+          color={isFavorite ? "#ff4646" : "#666"} 
         />
       </TouchableOpacity>
       <View style={styles.content}>
