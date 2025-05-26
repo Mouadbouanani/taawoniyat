@@ -40,8 +40,9 @@ public class StoreController {
     @GetMapping("/categories")
     public List<String> getAllCategories() {
         List<String> categories = new ArrayList<>();
-        categoryRepository.findAll().forEach(category -> categories.add(category.getName()));
-        return categories;}
+         categoryRepository.findAll().forEach(category -> categories.add(category.getName()));
+         return categories;
+    }
 
     // Get products by category name
     @GetMapping("/products/category/{name}")
@@ -68,24 +69,22 @@ public class StoreController {
     }
 
     @PostMapping("/addProduct")
-    public ResponseEntity<?> addProduct(@RequestBody Product product) {
+    public ResponseEntity<?> addProduct(@RequestBody Product product, jakarta.servlet.http.HttpSession session) {
+        // Get the current seller from the session
+        Seller currentSeller = (Seller) session.getAttribute("user");
+        if (currentSeller == null) {
+            return ResponseEntity.status(401).body("Seller not logged in");
+        }
+
+        // Set the seller to the current seller
+        product.setSeller(currentSeller);
+
         // Validate required fields
         if (product.getName() == null || product.getName().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Product name cannot be null or empty");
         }
-        
-        if (product.getSeller() == null) {
-            return ResponseEntity.badRequest().body("Seller information is required");
-        }
-
         if (product.getCategory() == null) {
             return ResponseEntity.badRequest().body("Category information is required");
-        }
-
-        // Verify seller exists
-        Seller seller = sellerRepository.findSelllerByBusinessName(product.getSeller());
-        if (seller == null) {
-            return ResponseEntity.badRequest().body("Seller not found with Business Name: "+product.getSeller());
         }
 
         // Verify category exists
@@ -93,6 +92,7 @@ public class StoreController {
         if (category == null) {
             return ResponseEntity.badRequest().body("Category not found with Name: " + product.getCategory());
         }
+        product.setCategory(category);
 
         try {
             Product savedProduct = productRepository.save(product);

@@ -1,8 +1,10 @@
 package esi.ma.taawoniyate.service;
 
 import esi.ma.taawoniyate.model.Client;
+import esi.ma.taawoniyate.model.Panier;
 import esi.ma.taawoniyate.model.Product;
 import esi.ma.taawoniyate.repository.ClientRepository;
+import esi.ma.taawoniyate.repository.PanierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -12,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -20,6 +21,9 @@ public class ClientService {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private PanierRepository panierRepository;
 
     @Cacheable(value = "clients", key = "#email")
     public Client findByEmail(String email) {
@@ -50,6 +54,11 @@ public class ClientService {
             client.setRole("client");
         }
         return clientRepository.save(client);
+    }
+
+    public Panier getClientPanier(Client client) {
+         return panierRepository.findByClient(client);
+
     }
 
     @Transactional
