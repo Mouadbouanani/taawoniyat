@@ -23,8 +23,6 @@ public class Panier {
     private Client client;
 
     // methode calculTotalAmount
-    @Column(nullable = false)
-    private BigDecimal totalAmount = BigDecimal.ZERO;
 
     public Panier() {
         this.items = new HashSet<>();

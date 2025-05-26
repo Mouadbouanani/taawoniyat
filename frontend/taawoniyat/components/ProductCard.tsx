@@ -4,51 +4,74 @@ import { Image } from 'expo-image';
 import { ThemedText } from './ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 
-type ProductProps = {
-  id: string;
-  title: string;
+// Define a type for the product data structure
+export type ProductData = {
+  id: number;
+  name: string;
   description: string;
   price: number;
-  rating: number;
-  image: string;
+  images: string[];
+  category: string;
+  quantity: number; // This is stock quantity from backend
+  sellerFullName: string;
+  isFavorite?: boolean; // Add optional isFavorite property
 };
 
-export function ProductCard({ title, description, price, rating, image }: ProductProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
+// Update ProductProps to use ProductData and include the onAddToCart and isFavorite/onToggleFavorite props
+type ProductProps = ProductData & {
+  onAddToCart: (product: ProductData) => void;
+  onToggleFavorite: (product: ProductData) => void; // onToggleFavorite now accepts ProductData
+  // isFavorite prop is now included in ProductData
+  onPress: () => void; // Add onPress prop for navigation
+};
+
+export function ProductCard({ id, name, description, price, images, onAddToCart, onToggleFavorite, isFavorite, category, quantity, sellerFullName, onPress }: ProductProps) {
+  // Remove internal isFavorite state
+  // const [isFavorite, setIsFavorite] = useState(false);
+
+  const imageUrl = images && images.length > 0 ? images[0] : '';
+
+  const productToAdd = {
+    id, name, description, price, images, category, quantity, sellerFullName,
+    // isFavorite is not part of the data being passed back, it's managed in the parent
+  };
 
   return (
-    <View style={styles.card}>
-      <Image source={image} style={styles.image} contentFit="cover" />
-      <TouchableOpacity 
+    <TouchableOpacity style={styles.card} onPress={onPress}>
+      {imageUrl ? (
+        <Image source={imageUrl} style={styles.image} contentFit="cover" />
+      ) : (
+        <View style={styles.placeholderImage}><ThemedText>No Image</ThemedText></View>
+      )}
+      <TouchableOpacity
         style={styles.favoriteButton}
-        onPress={() => setIsFavorite(!isFavorite)}
+        // Call onToggleFavorite and pass the product data
+        onPress={() => onToggleFavorite(productToAdd)}
       >
-        <Ionicons 
-          name={isFavorite ? "heart" : "heart-outline"} 
-          size={24} 
-          color={isFavorite ? "#ff4646" : "#666"} 
+        <Ionicons
+          // Use the isFavorite prop to determine the icon
+          name={isFavorite ? "heart" : "heart-outline"}
+          size={24}
+          color={isFavorite ? "#ff4646" : "#666"}
         />
       </TouchableOpacity>
       <View style={styles.content}>
-        <ThemedText type="subtitle" style={styles.title}>{title}</ThemedText>
+        <ThemedText type="subtitle" style={styles.title}>{name}</ThemedText>
         <ThemedText style={styles.description}>{description}</ThemedText>
         <View style={styles.footer}>
           <ThemedText type="defaultSemiBold" style={styles.price}>
             ${price.toFixed(2)}
           </ThemedText>
-          <View style={styles.rating}>
-            {[...Array(5)].map((_, i) => (
-              <Ionicons 
-                key={i}
-                name={i < rating ? "star" : "star-outline"}
-                size={16}
-                color="#FFD700"
-              />
-            ))}
-          </View>
+          <TouchableOpacity
+            style={styles.addToCartButton}
+            onPress={() => onAddToCart(productToAdd)}
+          >
+            <Ionicons name="add" size={20} color="#fff" />
+            <ThemedText style={styles.addToCartButtonText}>Add</ThemedText>
+          </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -91,10 +114,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#2E7D32',
   },
-  rating: {
-    flexDirection: 'row',
-    gap: 2,
-  },
   favoriteButton: {
     position: 'absolute',
     right: 12,
@@ -103,5 +122,28 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 8,
+  },
+  addToCartButton: {
+    backgroundColor: '#0a7ea4',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 4,
+  },
+  addToCartButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  placeholderImage: {
+    width: '100%',
+    height: 200,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    backgroundColor: '#e0e0e0',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

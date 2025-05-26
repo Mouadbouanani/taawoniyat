@@ -1,10 +1,16 @@
+import React, { useState, useEffect } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Tabs, useRouter } from 'expo-router';
+import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
-import { Button } from 'react-native';
+import { Button, TouchableOpacity } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import AuthModal from '@/components/AuthModal';
+import { useRouter } from 'expo-router';
+import { UserProvider, useUser } from '@/contexts/UserContext';
+import { ThemedText } from '@/components/ThemedText';
+import { Ionicons } from '@expo/vector-icons';
 
 // Import SVG icons
 import HomeIconInactive from '../assets/images/icons/shop-1.svg';
@@ -20,12 +26,29 @@ import AccountIconActive from '../assets/images/icons/account-2.svg';
 
 function LoginButton() {
   const router = useRouter();
-  
-  const handleLogin = () => {
-    router.push('/(auth)/login');
-  };
+  const { user, isAuthenticated, logout } = useUser();
 
-  return <Button title="Login" onPress={handleLogin} />;
+  if (isAuthenticated && user) {
+    return (
+      <TouchableOpacity
+        onPress={() => router.push('/account')}
+        style={{ marginRight: 15 }}
+      >
+        <ThemedText style={{ fontSize: 16, fontWeight: '600' }}>
+          {user.fullName}
+        </ThemedText>
+      </TouchableOpacity>
+    );
+  }
+
+  return (
+    <TouchableOpacity
+      onPress={() => router.push('/(auth)/login')}
+      style={{ marginRight: 15 }}
+    >
+      <ThemedText style={{ fontSize: 16, fontWeight: '600' }}>Login</ThemedText>
+    </TouchableOpacity>
+  );
 }
 
 export default function RootLayout() {
@@ -39,54 +62,71 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Tabs screenOptions={{ headerShown: true }}>
-        <Tabs.Screen
-          name="shop"
-          options={{
+    <UserProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Tabs
+          screenOptions={{
+            tabBarActiveTintColor: '#0a7ea4',
+            tabBarInactiveTintColor: '#666',
+            tabBarStyle: {
+              backgroundColor: colorScheme === 'dark' ? '#1a1a1a' : '#fff',
+              borderTopColor: colorScheme === 'dark' ? '#333' : '#ddd',
+            },
+            headerStyle: {
+              backgroundColor: colorScheme === 'dark' ? '#1a1a1a' : '#fff',
+            },
+            headerTintColor: colorScheme === 'dark' ? '#fff' : '#000',
             headerRight: () => <LoginButton />,
-            tabBarIcon: ({ focused }) =>
-              focused ? <HomeIconActive width={24} height={24} /> : <HomeIconInactive width={24} height={24} />,
           }}
-        />
-        <Tabs.Screen
-          name="explore"
-          options={{
-            headerRight: () => <LoginButton />,
-            title: 'Explore',
-            tabBarIcon: ({ focused }) =>
-              focused ? <ExploreIconActive width={24} height={24} /> : <ExploreIconInactive width={24} height={24} />,
-          }}
-        />
-        <Tabs.Screen
-          name="cart"
-          options={{
-            headerRight: () => <LoginButton />,
-            title: 'Cart',
-            tabBarIcon: ({ focused }) =>
-              focused ? <CartIconActive width={24} height={24} /> : <CartIconInactive width={24} height={24} />,
-          }}
-        />
-        <Tabs.Screen
-          name="favorite"
-          options={{
-            headerRight: () => <LoginButton />,
-            title: 'Favorite',
-            tabBarIcon: ({ focused }) =>
-              focused ? <FavoriteIconActive width={24} height={24} /> : <FavoriteIconInactive width={24} height={24} />,
-          }}
-        />
-        <Tabs.Screen
-          name="account"
-          options={{
-            headerRight: () => <LoginButton />,
-            title: 'Account',
-            tabBarIcon: ({ focused }) =>
-              focused ? <AccountIconActive width={24} height={24} /> : <AccountIconInactive width={24} height={24} />,
-          }}
-        />
-      </Tabs>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+        >
+          <Tabs.Screen
+            name="shop"
+            options={{
+              title: 'Shop',
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="home-outline" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="explore"
+            options={{
+              title: 'Explore',
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="search-outline" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="cart"
+            options={{
+              title: 'Cart',
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="cart-outline" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="favorite"
+            options={{
+              title: 'Favorite',
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="heart-outline" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="account"
+            options={{
+              title: 'Account',
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="person-outline" size={size} color={color} />
+              ),
+            }}
+          />
+        </Tabs>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </UserProvider>
   );
 }

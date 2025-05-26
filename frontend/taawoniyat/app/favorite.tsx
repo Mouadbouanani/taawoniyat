@@ -1,44 +1,68 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View, ActivityIndicator, Text } from 'react-native';
-import { ProductCard } from '@/components/ProductCard';
-import { Product, mockProducts } from '@/data/mockProducts';
-
-const USE_MOCK_DATA = true;
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  ActivityIndicator,
+  Text,
+  Alert,
+} from 'react-native';
+import { ProductCard, ProductData } from '@/components/ProductCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import { ThemedText } from '@/components/ThemedText';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function FavoriteScreen() {
-  const [favorites, setFavorites] = useState<Product[]>([]);
+  const [favorites, setFavorites] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchFavorites();
-  }, []);
-
-  const fetchFavorites = async () => {
+  const loadFavoriteProducts = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      if (USE_MOCK_DATA) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        // Use first 3 products as mock favorites
-        setFavorites(mockProducts.slice(0, 3));
-      } else {
-        const response = await fetch('YOUR_BACKEND_API_URL/favorites');
-        if (!response.ok) {
-          throw new Error('Failed to fetch favorites');
-        }
-        const data = await response.json();
-        setFavorites(data);
-      }
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      console.log('Loading favorite products from AsyncStorage...');
+      const existingFavoritesJson = await AsyncStorage.getItem('favoriteProducts');
+      const favorites: ProductData[] = existingFavoritesJson ? JSON.parse(existingFavoritesJson) : [];
+      console.log('Loaded favorite products:', favorites);
+      setFavorites(favorites);
+    } catch (error: any) {
+      console.error('Error loading favorite products from AsyncStorage:', error);
+      setError(error.message || 'Failed to load favorite products.');
+      Alert.alert('Error', error.message || 'Failed to load favorite products.');
     } finally {
       setLoading(false);
     }
   };
 
+  const saveFavoriteProducts = async (favorites: ProductData[]) => {
+    try {
+      console.log('Saving favorite products to AsyncStorage:', favorites);
+      await AsyncStorage.setItem('favoriteProducts', JSON.stringify(favorites));
+    } catch (error) {
+      console.error('Error saving favorite products to AsyncStorage:', error);
+      Alert.alert('Error', 'Failed to save favorite products.');
+    }
+  };
+
+  const handleToggleFavorite = async (productToToggle: ProductData) => {
+    const updatedFavorites = favorites.filter(fav => fav.id !== productToToggle.id);
+    setFavorites(updatedFavorites);
+    await saveFavoriteProducts(updatedFavorites);
+    Alert.alert('Removed from Favorites', `${productToToggle.name} has been removed from your favorites.`);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadFavoriteProducts();
+    }, [])
+  );
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#0a7ea4" />
       </View>
     );
   }
@@ -46,7 +70,7 @@ export default function FavoriteScreen() {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text>Error: {error}</Text>
+        <ThemedText style={styles.errorText}>Error: {error}</ThemedText>
       </View>
     );
   }
@@ -54,7 +78,10 @@ export default function FavoriteScreen() {
   if (favorites.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No favorite products yet</Text>
+        <Ionicons name="heart-outline" size={64} color="#666" />
+        <ThemedText style={styles.emptyText}>
+          No favorite products yet.
+        </ThemedText>
       </View>
     );
   }
@@ -64,7 +91,14 @@ export default function FavoriteScreen() {
       <View style={styles.grid}>
         {favorites.map((product) => (
           <View key={product.id} style={styles.productWrapper}>
-            <ProductCard {...product} />
+            <ProductCard
+              {...product}
+              isFavorite={true}
+              onToggleFavorite={handleToggleFavorite}
+              onAddToCart={() => {
+                Alert.alert('Add to Cart', 'Navigate to product page to add this item to cart.');
+              }}
+            />
           </View>
         ))}
       </View>
@@ -101,9 +135,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
   emptyText: {
     fontSize: 18,
+    color: '#666',
+    marginTop: 16,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  errorText: {
     color: '#666',
   },
 });
