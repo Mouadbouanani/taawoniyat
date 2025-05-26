@@ -12,8 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-
+@CrossOrigin(origins = "http://localhost:8081")
 @RestController
 @RequestMapping("/store")
 public class StoreController {
@@ -37,9 +38,10 @@ public class StoreController {
 
     // Get all categories
     @GetMapping("/categories")
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
-    }
+    public List<String> getAllCategories() {
+        List<String> categories = new ArrayList<>();
+        categoryRepository.findAll().forEach(category -> categories.add(category.getName()));
+        return categories;}
 
     // Get products by category name
     @GetMapping("/products/category/{name}")

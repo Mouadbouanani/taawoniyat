@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import { ThemedText } from './ThemedText';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,39 +11,12 @@ interface Category {
 interface SearchAndCategoriesProps {
   onSearch: (query: string) => void;
   onCategorySelect: (category: string) => void;
+  categories: Category[];
 }
 
-export function SearchAndCategories({ onSearch, onCategorySelect }: SearchAndCategoriesProps) {
+export function SearchAndCategories({ onSearch, onCategorySelect, categories }: SearchAndCategoriesProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/store/categories');
-      if (!response.ok) {
-        throw new Error('Failed to fetch categories');
-      }
-      const data = await response.json();
-      setCategories(data);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      // Fallback to mock categories if API fails
-      setCategories([
-        { id: 1, name: 'All' },
-        { id: 2, name: 'Oils' },
-        { id: 3, name: 'Spices' },
-        { id: 4, name: 'Beauty' },
-        { id: 5, name: 'Teas' },
-        { id: 6, name: 'Honey' },
-        { id: 7, name: 'Herbs' },
-      ]);
-    }
-  };
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);

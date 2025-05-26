@@ -74,8 +74,7 @@ export default function SellerRegisterScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.contentContainer}>
           <View style={styles.header}>
-            <ThemedText type="title" style={styles.title}>Create Account</ThemedText>
-            <ThemedText style={styles.subtitle}>Register as a seller</ThemedText>
+            <ThemedText type="title" style={styles.title}>Create Seller Account</ThemedText>
           </View>
 
           <View style={styles.inputContainer}>
@@ -220,10 +219,6 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
   },
   inputContainer: {
     marginBottom: 30,

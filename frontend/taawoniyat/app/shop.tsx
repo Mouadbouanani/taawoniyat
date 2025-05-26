@@ -1,43 +1,160 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View, ActivityIndicator, Text } from 'react-native';
-import { ProductCard } from '@/components/ProductCard';
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  ActivityIndicator,
+  Text,
+  RefreshControl,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
+import { ProductCard, ProductData } from '@/components/ProductCard';
 import { SearchAndCategories } from '@/components/SearchAndCategories';
-import { Product, mockProducts } from '@/data/mockProducts';
+// import { Product, mockProducts } from '@/data/mockProducts'; // Remove mock data import
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 
-// Set this to true to use mock data, false to use real API
-const USE_MOCK_DATA = true;
+// Define Product interface based on backend structure (if needed, review authService.ts)
+// Moved Product interface definition to ProductCard.tsx and renamed to ProductData
+// interface Product {
+//   id: number;
+//   name: string;
+//   description: string;
+//   price: number;
+//   images: string[]; // Updated to match backend - array of strings
+//   category: string;
+//   quantity: number; // Updated to match backend - 'quantity' for stock
+//   sellerFullName: string; // Added sellerFullName as per backend response
+//   // Removed sellerId as it's not in the /store/products response
+// }
+
+// Remove mock data flag
+// const USE_MOCK_DATA = true;
 
 export default function ShopScreen() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const router = useRouter();
+  const [products, setProducts] = useState<ProductData[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<ProductData[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [favoriteProducts, setFavoriteProducts] = useState<ProductData[]>([]);
+
+  // Function to load favorite products from AsyncStorage
+  const loadFavoriteProducts = async () => {
+    try {
+      console.log('Loading favorite products from AsyncStorage...');
+      const existingFavoritesJson = await AsyncStorage.getItem('favoriteProducts');
+      const favorites: ProductData[] = existingFavoritesJson ? JSON.parse(existingFavoritesJson) : [];
+      console.log('Loaded favorite products:', favorites);
+      setFavoriteProducts(favorites);
+    } catch (error) {
+      console.error('Error loading favorite products from AsyncStorage:', error);
+    }
+  };
+
+  // Function to save favorite products to AsyncStorage
+  const saveFavoriteProducts = async (favorites: ProductData[]) => {
+    try {
+      console.log('Saving favorite products to AsyncStorage:', favorites);
+      await AsyncStorage.setItem('favoriteProducts', JSON.stringify(favorites));
+    } catch (error) {
+      console.error('Error saving favorite products to AsyncStorage:', error);
+    }
+  };
+
+  // Function to toggle favorite status
+  const handleToggleFavorite = async (productToToggle: ProductData) => {
+    let updatedFavorites: ProductData[];
+    const isCurrentlyFavorite = favoriteProducts.some(fav => fav.id === productToToggle.id);
+
+    if (isCurrentlyFavorite) {
+      // Remove from favorites
+      updatedFavorites = favoriteProducts.filter(fav => fav.id !== productToToggle.id);
+      Alert.alert('Removed from Favorites', `${productToToggle.name} has been removed from your favorites.`);
+    } else {
+      // Add to favorites
+      updatedFavorites = [...favoriteProducts, productToToggle];
+      Alert.alert('Added to Favorites', `${productToToggle.name} has been added to your favorites.`);
+    }
+
+    setFavoriteProducts(updatedFavorites);
+    await saveFavoriteProducts(updatedFavorites);
+
+    // Update the filtered products list to reflect the change immediately
+    setFilteredProducts(currentFiltered =>
+      currentFiltered.map(product =>
+        product.id === productToToggle.id ? { ...product, isFavorite: !isCurrentlyFavorite } as ProductData : product
+      )
+    );
+  };
+
+  // Define Category interface based on backend structure (if needed, review SearchAndCategories.tsx)
+  interface Category {
+    id: number;
+    name: string;
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/store/categories');
+      if (!response.ok) {
+        throw new Error('Failed to fetch categories');
+      }
+      const data = await response.json();
+      console.log('Fetched categories:', data); // Log fetched categories
+      setCategories(data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      // Optionally, set error state for categories or handle fallback
+    }
+  };
 
   useEffect(() => {
     fetchProducts();
+    loadFavoriteProducts();
+    fetchCategories(); // Fetch categories when component mounts
   }, []);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    setError(null);
     try {
-      if (USE_MOCK_DATA) {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setProducts(mockProducts);
-        setFilteredProducts(mockProducts);
-      } else {
-        const response = await fetch('http://localhost:8080/store/products');
-        if (!response.ok) {
-          throw new Error('Failed to fetch products');
-        }
-        const data = await response.json();
-        setProducts(data);
-        setFilteredProducts(data);
+      console.log('Fetching products from: http://localhost:8080/store/products'); // Log before fetch
+      // Fetch from backend API
+      const response = await fetch('http://localhost:8080/store/products');
+
+      console.log('Received response. Status:', response.status, 'OK:', response.ok); // Log after fetch
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response body:', errorText); // Log error response body
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
+
+      console.log('Response is OK, parsing JSON...'); // Log before parsing
+      const data: ProductData[] = await response.json();
+      console.log('JSON parsed successfully. Data received:', data.length, 'items'); // Log after parsing
+      console.log('Fetched products data:', data); // Add this line to log the fetched data
+
+      setProducts(data);
+      setFilteredProducts(data);
+    } catch (error: any) {
+      console.error('Detailed fetch error:', error); // Log the caught error with more context
+      setError(error.message || 'An error occurred while fetching products');
+      Alert.alert('Error', error.message || 'Failed to load products.');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchProducts(false); // Don't show full screen loader on refresh
   };
 
   const handleSearch = (query: string) => {
@@ -46,7 +163,9 @@ export default function ShopScreen() {
       return;
     }
     const filtered = products.filter(product =>
-      product.title.toLowerCase().includes(query.toLowerCase())
+      // Search by name or description
+      product.name.toLowerCase().includes(query.toLowerCase()) ||
+      product.description.toLowerCase().includes(query.toLowerCase())
     );
     setFilteredProducts(filtered);
   };
@@ -56,16 +175,66 @@ export default function ShopScreen() {
       setFilteredProducts(products);
       return;
     }
-    const filtered = products.filter(product =>
-      product.category?.toLowerCase() === category.toLowerCase()
-    );
+    const filtered = products.filter(product => {
+      // Explicitly check if product is valid and has a category before processing
+      if (!product || typeof product.category !== 'string') {
+        console.warn('Skipping invalid product in filter:', product);
+        return false; // Skip null, undefined, or products with non-string category
+      }
+      // Now we are sure product.category is a string, proceed with comparison
+      return product.category.toLowerCase() === category.toLowerCase();
+    });
     setFilteredProducts(filtered);
   };
+
+  // Function to handle adding products to the cart (using AsyncStorage)
+  const handleAddToCart = async (productToAdd: ProductData) => {
+    try {
+      // Get current cart items from AsyncStorage
+      const existingCartJson = await AsyncStorage.getItem('cartItems');
+      let cartItems: (ProductData & { cartQuantity: number })[] = existingCartJson
+        ? JSON.parse(existingCartJson)
+        : [];
+
+      // Check if the product is already in the cart
+      const existingItemIndex = cartItems.findIndex(item => item.id === productToAdd.id);
+
+      if (existingItemIndex > -1) {
+        // If item exists, increase quantity
+        cartItems[existingItemIndex].cartQuantity += 1;
+      } else {
+        // If item doesn't exist, add it with quantity 1
+        cartItems.push({ ...productToAdd, cartQuantity: 1 });
+      }
+
+      // Save updated cart items back to AsyncStorage
+      await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+      Alert.alert('Success', `${productToAdd.name} added to cart!`);
+      console.log(`Product ${productToAdd.name} added to cart. Current cart:`, cartItems);
+
+    } catch (error: any) {
+      console.error('Error adding product to cart to AsyncStorage:', error);
+      Alert.alert('Error', 'Failed to add product to cart.');
+    }
+  };
+
+  // Update filtered products when products or favoriteProducts state changes
+  useEffect(() => {
+    console.log('Updating filtered products...'); // Log when this effect runs
+    console.log('Current products state:', products); // Log the products state
+    console.log('Current favoriteProducts state:', favoriteProducts); // Log the favoriteProducts state
+    const productsWithFavoriteStatus = products.map(product => ({
+      ...product,
+      isFavorite: favoriteProducts.some(fav => fav.id === product.id),
+    })) as ProductData[]; // Cast to ProductData array
+    setFilteredProducts(productsWithFavoriteStatus);
+  }, [products, favoriteProducts]);
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#0a7ea4" />
       </View>
     );
   }
@@ -73,7 +242,10 @@ export default function ShopScreen() {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text>Error: {error}</Text>
+        <Text style={styles.errorText}>Error: {error}</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={() => fetchProducts()}>
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -83,15 +255,33 @@ export default function ShopScreen() {
       <SearchAndCategories
         onSearch={handleSearch}
         onCategorySelect={handleCategorySelect}
+        categories={categories} // Pass categories to the component
       />
-      <ScrollView style={styles.productsContainer}>
-        <View style={styles.grid}>
-          {filteredProducts.map((product) => (
+      <ScrollView
+        style={styles.productsContainer}
+        contentContainerStyle={styles.grid}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => (
             <View key={product.id} style={styles.productWrapper}>
-              <ProductCard {...product} />
+              {/* Pass the handleAddToCart and onToggleFavorite functions and isFavorite status */}
+              <ProductCard
+                {...product}
+                onAddToCart={handleAddToCart}
+                onToggleFavorite={handleToggleFavorite}
+                isFavorite={product.isFavorite || false} // Pass isFavorite status
+                onPress={() => router.push(`/product?id=${product.id}`)} // Add onPress handler for navigation
+              />
             </View>
-          ))}
-        </View>
+          ))
+        ) : (
+          <View style={styles.noProductsContainer}>
+            <Text style={styles.noProductsText}>No products found</Text>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -124,5 +314,30 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  errorText: {
+    color: '#666',
+  },
+  retryButton: {
+    marginTop: 12,
+    backgroundColor: '#0a7ea4',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 4,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  noProductsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 50, // Adjust as needed
+    width: '100%',
+  },
+  noProductsText: {
+    fontSize: 18,
+    color: '#666',
   },
 });
