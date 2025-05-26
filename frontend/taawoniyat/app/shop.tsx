@@ -14,7 +14,6 @@ import { SearchAndCategories } from '@/components/SearchAndCategories';
 // import { Product, mockProducts } from '@/data/mockProducts'; // Remove mock data import
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
 
 // Define Product interface based on backend structure (if needed, review authService.ts)
 // Moved Product interface definition to ProductCard.tsx and renamed to ProductData
@@ -34,10 +33,8 @@ import { useRouter } from 'expo-router';
 // const USE_MOCK_DATA = true;
 
 export default function ShopScreen() {
-  const router = useRouter();
   const [products, setProducts] = useState<ProductData[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<ProductData[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -92,31 +89,9 @@ export default function ShopScreen() {
     );
   };
 
-  // Define Category interface based on backend structure (if needed, review SearchAndCategories.tsx)
-  interface Category {
-    id: number;
-    name: string;
-  }
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/store/categories');
-      if (!response.ok) {
-        throw new Error('Failed to fetch categories');
-      }
-      const data = await response.json();
-      console.log('Fetched categories:', data); // Log fetched categories
-      setCategories(data);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      // Optionally, set error state for categories or handle fallback
-    }
-  };
-
   useEffect(() => {
     fetchProducts();
     loadFavoriteProducts();
-    fetchCategories(); // Fetch categories when component mounts
   }, []);
 
   const fetchProducts = async (showLoading = true) => {
@@ -138,7 +113,6 @@ export default function ShopScreen() {
       console.log('Response is OK, parsing JSON...'); // Log before parsing
       const data: ProductData[] = await response.json();
       console.log('JSON parsed successfully. Data received:', data.length, 'items'); // Log after parsing
-      console.log('Fetched products data:', data); // Add this line to log the fetched data
 
       setProducts(data);
       setFilteredProducts(data);
@@ -176,13 +150,9 @@ export default function ShopScreen() {
       return;
     }
     const filtered = products.filter(product => {
-      // Explicitly check if product is valid and has a category before processing
-      if (!product || typeof product.category !== 'string') {
-        console.warn('Skipping invalid product in filter:', product);
-        return false; // Skip null, undefined, or products with non-string category
-      }
-      // Now we are sure product.category is a string, proceed with comparison
-      return product.category.toLowerCase() === category.toLowerCase();
+      // Use a default empty string if product or product.category is null/undefined
+      const productCategory = product?.category ?? '';
+      return productCategory.toLowerCase() === category.toLowerCase();
     });
     setFilteredProducts(filtered);
   };
@@ -221,9 +191,6 @@ export default function ShopScreen() {
 
   // Update filtered products when products or favoriteProducts state changes
   useEffect(() => {
-    console.log('Updating filtered products...'); // Log when this effect runs
-    console.log('Current products state:', products); // Log the products state
-    console.log('Current favoriteProducts state:', favoriteProducts); // Log the favoriteProducts state
     const productsWithFavoriteStatus = products.map(product => ({
       ...product,
       isFavorite: favoriteProducts.some(fav => fav.id === product.id),
@@ -255,7 +222,6 @@ export default function ShopScreen() {
       <SearchAndCategories
         onSearch={handleSearch}
         onCategorySelect={handleCategorySelect}
-        categories={categories} // Pass categories to the component
       />
       <ScrollView
         style={styles.productsContainer}
@@ -273,7 +239,6 @@ export default function ShopScreen() {
                 onAddToCart={handleAddToCart}
                 onToggleFavorite={handleToggleFavorite}
                 isFavorite={product.isFavorite || false} // Pass isFavorite status
-                onPress={() => router.push(`/product?id=${product.id}`)} // Add onPress handler for navigation
               />
             </View>
           ))
