@@ -22,10 +22,9 @@ type ProductProps = ProductData & {
   onAddToCart: (product: ProductData) => void;
   onToggleFavorite: (product: ProductData) => void; // onToggleFavorite now accepts ProductData
   // isFavorite prop is now included in ProductData
-  onPress: () => void; // Add onPress prop for navigation
 };
 
-export function ProductCard({ id, name, description, price, images, onAddToCart, onToggleFavorite, isFavorite, category, quantity, sellerFullName, onPress }: ProductProps) {
+export function ProductCard({ id, name, description, price, images, onAddToCart, onToggleFavorite, isFavorite, category, quantity, sellerFullName }: ProductProps) {
   // Remove internal isFavorite state
   // const [isFavorite, setIsFavorite] = useState(false);
 
@@ -37,7 +36,7 @@ export function ProductCard({ id, name, description, price, images, onAddToCart,
   };
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
+    <View style={styles.card}>
       {imageUrl ? (
         <Image source={imageUrl} style={styles.image} contentFit="cover" />
       ) : (
@@ -71,7 +70,7 @@ export function ProductCard({ id, name, description, price, images, onAddToCart,
           </TouchableOpacity>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
