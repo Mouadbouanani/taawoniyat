@@ -31,7 +31,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await login(email, password);
-      router.replace('/shop');
+      router.replace('./account');
     } catch (error) {
       console.error('Login error:', error);
       Alert.alert('Error', 'Failed to connect to the server or network error.');
@@ -47,8 +47,8 @@ export default function LoginScreen() {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <ThemedText type="title" style={styles.title}>Welcome Back!</ThemedText>
-          <ThemedText style={styles.subtitle}>Sign in to continue</ThemedText>
+          <ThemedText variant="h1" style={styles.title}>Welcome Back!</ThemedText>
+          <ThemedText variant="body1" style={styles.subtitle}>Sign in to continue</ThemedText>
         </View>
 
         <View style={styles.inputContainer}>
@@ -84,16 +84,16 @@ export default function LoginScreen() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <ThemedText style={styles.loginButtonText}>Login</ThemedText>
+            <ThemedText variant="button" style={styles.loginButtonText}>Login</ThemedText>
           )}
         </TouchableOpacity>
 
         <View style={styles.registerContainer}>
-          <ThemedText style={styles.registerText}>Don't have an account? </ThemedText>
+          <ThemedText variant="body1" style={styles.registerText}>Don't have an account? </ThemedText>
           <TouchableOpacity onPress={() => {
-            router.push('/(auth)/register-select');
+            router.push('./register-select');
           }}>
-            <ThemedText style={styles.registerLink}>Register</ThemedText>
+            <ThemedText variant="button" style={styles.registerLink}>Register</ThemedText>
           </TouchableOpacity>
         </View>
       </ScrollView>

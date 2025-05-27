@@ -9,6 +9,8 @@ import {
   Image,
   RefreshControl,
   Text,
+  Modal,
+  TextInput,
 } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,13 +19,15 @@ import { authService, Order, OrderItem } from '@/services/authService';
 import { ProductData } from '@/components/ProductCard';
 import { useRouter } from 'expo-router';
 import { Image as ExpoImage } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
+import { Platform } from 'react-native';
 
 const InfoItem = ({ icon, label, value }: { icon: keyof typeof Ionicons.glyphMap; label: string; value: string | number | undefined | null }) => (
   <View style={styles.infoItem}>
     <Ionicons name={icon} size={20} color="#666" />
     <View style={styles.infoTextContainer}>
-      <ThemedText style={styles.infoLabel}>{label}:</ThemedText>
-      <ThemedText style={styles.infoValue}>{value ?? 'N/A'}</ThemedText>
+      <ThemedText variant="body1" style={styles.infoLabel}>{label}:</ThemedText>
+      <ThemedText variant="body1" style={styles.infoValue}>{value ?? 'N/A'}</ThemedText>
     </View>
   </View>
 );
@@ -32,9 +36,9 @@ const ProductItem = ({ product, onEdit, onDelete }: { product: ProductData; onEd
   <View style={sellerStyles.productItem}>
     <ExpoImage source={{ uri: product.images?.[0] || '' }} style={sellerStyles.productImage} contentFit="cover" />
     <View style={sellerStyles.productInfo}>
-      <ThemedText style={sellerStyles.productName}>{product.name}</ThemedText>
-      <ThemedText style={sellerStyles.productPrice}>${product.price.toFixed(2)}</ThemedText>
-      <ThemedText style={sellerStyles.productStock}>Stock: {product.quantity}</ThemedText>
+      <ThemedText variant="body1" style={sellerStyles.productName}>{product.name}</ThemedText>
+      <ThemedText variant="body1" style={sellerStyles.productPrice}>${product.price.toFixed(2)}</ThemedText>
+      <ThemedText variant="body2" style={sellerStyles.productStock}>Stock: {product.quantity}</ThemedText>
     </View>
     <View style={sellerStyles.productActions}>
       <TouchableOpacity onPress={() => onEdit(product)} style={sellerStyles.actionButton}>
@@ -49,32 +53,201 @@ const ProductItem = ({ product, onEdit, onDelete }: { product: ProductData; onEd
 
 const OrderItemDetail = ({ item }: { item: OrderItem }) => (
   <View style={orderStyles.orderItemDetail}>
-    <ThemedText style={orderStyles.orderItemName}>{item.productName}</ThemedText>
-    <ThemedText style={orderStyles.orderItemQuantity}>Qty: {item.quantity}</ThemedText>
-    <ThemedText style={orderStyles.orderItemPrice}>${item.price.toFixed(2)}</ThemedText>
+    <ThemedText variant="body1" style={orderStyles.orderItemName}>{item.productName}</ThemedText>
+    <ThemedText variant="body2" style={orderStyles.orderItemQuantity}>Qty: {item.quantity}</ThemedText>
+    <ThemedText variant="body1" style={orderStyles.orderItemPrice}>${item.price.toFixed(2)}</ThemedText>
   </View>
 );
 
 const OrderCard = ({ order, isSellerView }: { order: Order; isSellerView: boolean }) => (
   <View style={orderStyles.orderCard}>
-    <ThemedText type="subtitle" style={orderStyles.orderId}>Order #{order.id}</ThemedText>
+    <ThemedText variant="h4" style={orderStyles.orderId}>Order #{order.id}</ThemedText>
     {isSellerView && order.client && (
       <View style={orderStyles.clientInfo}>
-        <ThemedText style={orderStyles.clientName}>Client: {order.client.fullName}</ThemedText>
-        <ThemedText style={orderStyles.clientEmail}>Email: {order.client.email}</ThemedText>
+        <ThemedText variant="body1" style={orderStyles.clientName}>Client: {order.client.fullName}</ThemedText>
+        <ThemedText variant="body2" style={orderStyles.clientEmail}>Email: {order.client.email}</ThemedText>
       </View>
     )}
-    <ThemedText style={orderStyles.orderDate}>Date: {new Date(order.orderDate).toLocaleDateString()}</ThemedText>
-    <ThemedText style={orderStyles.orderStatus}>Status: {order.status}</ThemedText>
+    <ThemedText variant="body2" style={orderStyles.orderDate}>Date: {new Date(order.orderDate).toLocaleDateString()}</ThemedText>
+    <ThemedText variant="body2" style={orderStyles.orderStatus}>Status: {order.status}</ThemedText>
     <View style={orderStyles.orderItemsContainer}>
-      <ThemedText style={orderStyles.itemsTitle}>Items:</ThemedText>
+      <ThemedText variant="body1" style={orderStyles.itemsTitle}>Items:</ThemedText>
       {order.items.map(item => (
         <OrderItemDetail key={item.productId} item={item} />
       ))}
     </View>
-    <ThemedText type="defaultSemiBold" style={orderStyles.orderTotal}>Total: ${order.totalAmount.toFixed(2)}</ThemedText>
+    <ThemedText variant="body1" style={orderStyles.orderTotal}>Total: ${order.totalAmount.toFixed(2)}</ThemedText>
   </View>
 );
+
+const AddProductModal = ({ visible, onClose, onProductAdded }: { visible: boolean; onClose: () => void; onProductAdded: () => void }) => {
+  const [productName, setProductName] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [productImage, setProductImage] = useState<any>(null);
+  const [category, setCategory] = useState('');
+  const [quantity, setQuantity] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const pickImage = async () => {
+    if (Platform.OS !== 'web') {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Sorry, we need camera roll permissions to make this work!');
+        return;
+      }
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const asset = result.assets[0];
+      if (Platform.OS === 'web') {
+        const response = await fetch(asset.uri);
+        const blob = await response.blob();
+        const file = new File([blob], asset.fileName || 'upload.jpg', { type: blob.type });
+        setProductImage(file);
+      } else {
+        setProductImage({ uri: asset.uri, name: asset.fileName, type: asset.mimeType });
+      }
+    }
+  };
+
+  const handleAddProduct = async () => {
+    if (!productName || !description || !price || !productImage || !category || !quantity) {
+      Alert.alert('Missing Fields', 'Please fill in all product details and select an image.');
+      return;
+    }
+
+    const newProductData = {
+      name: productName,
+      description: description,
+      price: parseFloat(price),
+      category: category,
+      quantity: parseInt(quantity, 10),
+    };
+
+    setLoading(true);
+    let addedProduct = null;
+    try {
+      addedProduct = await authService.addSellerProduct(newProductData);
+
+      if (!addedProduct) {
+        Alert.alert('Error', 'Failed to add product details.');
+        return;
+      }
+
+      const imageUrl = await authService.uploadProductImage(addedProduct.id, productImage);
+
+      if (!imageUrl) {
+        Alert.alert('Image Upload Failed', 'Product details saved, but failed to upload image.');
+      }
+
+      Alert.alert('Success', 'Product added successfully!');
+      onProductAdded();
+      onClose();
+      resetForm();
+    } catch (error) {
+      console.error('Error adding product with image:', error);
+      Alert.alert('Error', 'An unexpected error occurred during product creation.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setProductName('');
+    setDescription('');
+    setPrice('');
+    setProductImage(null);
+    setCategory('');
+    setQuantity('');
+  };
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}
+    >
+      <View style={modalStyles.modalContainer}>
+        <View style={modalStyles.modalContent}>
+          <View style={modalStyles.modalHeader}>
+            <ThemedText variant="h3" style={modalStyles.modalTitle}>Add New Product</ThemedText>
+            <TouchableOpacity onPress={onClose} style={modalStyles.closeButton}>
+              <Ionicons name="close" size={24} color="#333" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={modalStyles.scrollView}>
+            <TextInput
+              style={modalStyles.input}
+              placeholder="Product Name"
+              value={productName}
+              onChangeText={setProductName}
+            />
+            <TextInput
+              style={[modalStyles.input, modalStyles.descriptionInput]}
+              placeholder="Description"
+              value={description}
+              onChangeText={setDescription}
+              multiline
+            />
+            <TextInput
+              style={modalStyles.input}
+              placeholder="Price"
+              value={price}
+              onChangeText={setPrice}
+              keyboardType="decimal-pad"
+            />
+            <TouchableOpacity style={modalStyles.imagePickerButton} onPress={pickImage}>
+              <Ionicons name="image-outline" size={24} color="#0a7ea4" />
+              <ThemedText variant="body1" style={modalStyles.imagePickerButtonText}>
+                {productImage ? 'Image Selected' : 'Pick Product Image'}
+              </ThemedText>
+            </TouchableOpacity>
+            {productImage && (
+              <ThemedText variant="body2" style={modalStyles.imageSelectedText}>
+                {Platform.OS === 'web' ? (productImage as File).name : (productImage as { name: string }).name}
+              </ThemedText>
+            )}
+            <TextInput
+              style={modalStyles.input}
+              placeholder="Category"
+              value={category}
+              onChangeText={setCategory}
+            />
+            <TextInput
+              style={modalStyles.input}
+              placeholder="Quantity (Stock)"
+              value={quantity}
+              onChangeText={setQuantity}
+              keyboardType="number-pad"
+            />
+
+            <TouchableOpacity
+              style={modalStyles.addButton}
+              onPress={handleAddProduct}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <ThemedText variant="button" style={modalStyles.addButtonText}>Add Product</ThemedText>
+              )}
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 export default function AccountScreen() {
   const { user, logout } = useUser();
@@ -86,6 +259,7 @@ export default function AccountScreen() {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [showProducts, setShowProducts] = useState(false);
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
 
   const fetchUserData = useCallback(async () => {
     setRefreshing(true);
@@ -125,8 +299,7 @@ export default function AccountScreen() {
   };
 
   const handleAddProduct = () => {
-    console.log('Add Product button pressed');
-    router.push('/product/add');
+    setShowAddProductModal(true);
   };
 
   const handleEditProduct = (product: ProductData) => {
@@ -169,15 +342,15 @@ export default function AccountScreen() {
       }
     >
       <View style={styles.header}>
-        <ThemedText type="title">My Account</ThemedText>
+        <ThemedText variant="h2">My Account</ThemedText>
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <ThemedText style={styles.logoutButtonText}>Logout</ThemedText>
+          <ThemedText variant="button" style={styles.logoutButtonText}>Logout</ThemedText>
           <Ionicons name="log-out-outline" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
-        <ThemedText type="subtitle">Personal Information</ThemedText>
+        <ThemedText variant="h3">Personal Information</ThemedText>
         <InfoItem icon="person-outline" label="Name" value={user.fullName} />
         <InfoItem icon="mail-outline" label="Email" value={user.email} />
         {user.phone && <InfoItem icon="call-outline" label="Phone" value={user.phone} />}
@@ -192,13 +365,13 @@ export default function AccountScreen() {
 
       {user.role === 'client' && (
         <View style={styles.section}>
-          <ThemedText type="subtitle">Order History</ThemedText>
+          <ThemedText variant="h3">Order History</ThemedText>
           {loadingOrders ? (
             <ActivityIndicator size="small" color="#0a7ea4" />
           ) : clientOrders.length > 0 ? (
             clientOrders.map(order => <OrderCard key={order.id} order={order} isSellerView={false} />)
           ) : (
-            <ThemedText style={styles.emptySectionText}>No orders placed yet.</ThemedText>
+            <ThemedText variant="body1" style={styles.emptySectionText}>No orders placed yet.</ThemedText>
           )}
         </View>
       )}
@@ -207,7 +380,7 @@ export default function AccountScreen() {
         <>
           <View style={styles.section}>
             <TouchableOpacity onPress={() => setShowProducts(!showProducts)} style={styles.sectionHeader}>
-              <ThemedText type="subtitle">My Products</ThemedText>
+              <ThemedText variant="h3">My Products</ThemedText>
               <Ionicons name={showProducts ? "chevron-up" : "chevron-down"} size={24} color="#333" />
             </TouchableOpacity>
             {loadingProducts ? (
@@ -219,28 +392,34 @@ export default function AccountScreen() {
                 ))}
               </View>
             ) : showProducts && (
-              <ThemedText style={styles.emptySectionText}>No products listed yet.</ThemedText>
+              <ThemedText variant="body1" style={styles.emptySectionText}>No products listed yet.</ThemedText>
             )}
             {showProducts && (
-               <TouchableOpacity onPress={handleAddProduct} style={sellerStyles.addButton}>
-                 <Ionicons name="add-circle-outline" size={24} color="#0a7ea4" />
-                 <ThemedText style={sellerStyles.addButtonText}>Add New Product</ThemedText>
-               </TouchableOpacity>
+              <TouchableOpacity onPress={handleAddProduct} style={sellerStyles.addButton}>
+                <Ionicons name="add-circle-outline" size={24} color="#0a7ea4" />
+                <ThemedText variant="button" style={sellerStyles.addButtonText}>Add New Product</ThemedText>
+              </TouchableOpacity>
             )}
           </View>
 
           <View style={styles.section}>
-            <ThemedText type="subtitle">Orders Received</ThemedText>
+            <ThemedText variant="h3">Orders Received</ThemedText>
             {loadingOrders ? (
-               <ActivityIndicator size="small" color="#0a7ea4" />
+              <ActivityIndicator size="small" color="#0a7ea4" />
             ) : sellerOrders.length > 0 ? (
               sellerOrders.map(order => <OrderCard key={order.id} order={order} isSellerView={true} />)
             ) : (
-              <ThemedText style={styles.emptySectionText}>No orders received yet.</ThemedText>
+              <ThemedText variant="body1" style={styles.emptySectionText}>No orders received yet.</ThemedText>
             )}
           </View>
         </>
       )}
+
+      <AddProductModal
+        visible={showAddProductModal}
+        onClose={() => setShowAddProductModal(false)}
+        onProductAdded={fetchUserData}
+      />
     </ScrollView>
   );
 }
@@ -463,4 +642,84 @@ const orderStyles = StyleSheet.create({
     textAlign: 'right',
     color: '#2E7D32',
   }
+});
+
+const modalStyles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    width: '90%',
+    maxHeight: '80%',
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    padding: 5,
+  },
+  scrollView: {
+    maxHeight: '100%',
+  },
+  input: {
+    width: '100%',
+    backgroundColor: '#f5f5f5',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 15,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  descriptionInput: {
+    minHeight: 100,
+    textAlignVertical: 'top',
+  },
+  imagePickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    justifyContent: 'center',
+  },
+  imagePickerButtonText: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#0a7ea4',
+  },
+  imageSelectedText: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  addButton: {
+    backgroundColor: '#0a7ea4',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });

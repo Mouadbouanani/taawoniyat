@@ -31,7 +31,7 @@ function LoginButton() {
   if (isAuthenticated && user) {
     return (
       <TouchableOpacity
-        onPress={() => router.push('/account')}
+        onPress={() => router.push('/Account/account')}
         style={{ marginRight: 15 }}
       >
         <ThemedText style={{ fontSize: 16, fontWeight: '600' }}>
@@ -43,7 +43,7 @@ function LoginButton() {
 
   return (
     <TouchableOpacity
-      onPress={() => router.push('/(auth)/login')}
+      onPress={() => router.push('/Account/login')}
       style={{ marginRight: 15 }}
     >
       <ThemedText style={{ fontSize: 16, fontWeight: '600' }}>Login</ThemedText>
@@ -116,7 +116,7 @@ export default function RootLayout() {
             }}
           />
           <Tabs.Screen
-            name="account"
+            name="Account"
             options={{
               title: 'Account',
               tabBarIcon: ({ color, size }) => (
