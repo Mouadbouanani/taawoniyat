@@ -17,6 +17,9 @@ import  jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Optional;
+import esi.ma.taawoniyate.model.PanierItem;
+import esi.ma.taawoniyate.repository.PanierItemRepository;
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/api/sellers")
@@ -25,6 +28,8 @@ public class SellerController {
 
     @Autowired
     private SellerService sellerService;
+    @Autowired
+    private PanierItemRepository panierItemRepository;
 
     @GetMapping
     public ResponseEntity<Page<Seller>> getAllSellers(
@@ -106,5 +111,15 @@ public class SellerController {
     public ResponseEntity<Boolean> checkSellerExists(@PathVariable Integer id) {
         boolean exists = sellerService.existsById(id);
         return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/my-panier-items")
+    public ResponseEntity<?> getMyPanierItems(HttpSession session) {
+        Seller currentSeller = (Seller) session.getAttribute("user");
+        if (currentSeller == null) {
+            return ResponseEntity.status(401).body("Seller not logged in");
+        }
+        List<PanierItem> items = panierItemRepository.findAllBySeller(currentSeller);
+        return ResponseEntity.ok(items);
     }
 }

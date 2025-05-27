@@ -1,0 +1,212 @@
+2025-05-26T02:56:13.838+01:00  INFO 18188 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : Starting TaawoniyateApplication using Java 17.0.12 with PID 18188 (C:\Users\pc\Documents\taawoniyate\target\classes started by pc in C:\Users\pc\Documents\taawoniyate)
+2025-05-26T02:56:13.839+01:00  INFO 18188 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-05-26T02:56:14.047+01:00  INFO 18188 --- [taawoniyate] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-05-26T02:56:14.070+01:00  INFO 18188 --- [taawoniyate] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 23 ms. Found 8 JPA repository interfaces.
+2025-05-26T02:56:14.196+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-05-26T02:56:14.197+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-05-26T02:56:14.198+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+2025-05-26T02:56:14.216+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-05-26T02:56:14.217+01:00  INFO 18188 --- [taawoniyate] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 376 ms
+2025-05-26T02:56:14.266+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-05-26T02:56:14.270+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-05-26T02:56:14.284+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-05-26T02:56:14.285+01:00  INFO 18188 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2025-05-26T02:56:15.250+01:00  INFO 18188 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@698502a3
+2025-05-26T02:56:15.250+01:00  INFO 18188 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2025-05-26T02:56:15.385+01:00  WARN 18188 --- [taawoniyate] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-05-26T02:56:15.570+01:00  INFO 18188 --- [taawoniyate] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-2)']
+	Database driver: undefined/unknown
+	Database version: 17.5
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-05-26T02:56:15.862+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-05-26T02:56:19.407+01:00  INFO 18188 --- [taawoniyate] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-05-26T02:56:19.599+01:00  WARN 18188 --- [taawoniyate] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-05-26T02:56:19.733+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-05-26T02:56:19.748+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-05-26T02:56:19.754+01:00  INFO 18188 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : Started TaawoniyateApplication in 5.97 seconds (process running for 1209.722)
+2025-05-26T02:56:19.757+01:00  INFO 18188 --- [taawoniyate] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-05-26T02:56:44.614+01:00  INFO 18188 --- [taawoniyate] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (1 addition, 0 deletions, 0 modifications)
+2025-05-26T02:56:44.615+01:00  INFO 18188 --- [taawoniyate] [Thread-7] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-05-26T02:56:44.923+01:00  INFO 18188 --- [taawoniyate] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-05-26T02:56:44.925+01:00  INFO 18188 --- [taawoniyate] [Thread-7] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-05-26T02:56:44.926+01:00  INFO 18188 --- [taawoniyate] [Thread-7] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2025-05-26T02:56:45.863+01:00  INFO 18188 --- [taawoniyate] [Thread-7] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+2025-05-26T02:56:45.954+01:00  INFO 18188 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : Starting TaawoniyateApplication using Java 17.0.12 with PID 18188 (C:\Users\pc\Documents\taawoniyate\target\classes started by pc in C:\Users\pc\Documents\taawoniyate)
+2025-05-26T02:56:45.955+01:00  INFO 18188 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-05-26T02:56:46.145+01:00  INFO 18188 --- [taawoniyate] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-05-26T02:56:46.166+01:00  INFO 18188 --- [taawoniyate] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 20 ms. Found 8 JPA repository interfaces.
+2025-05-26T02:56:46.477+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-05-26T02:56:46.477+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-05-26T02:56:46.477+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+2025-05-26T02:56:46.492+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-05-26T02:56:46.493+01:00  INFO 18188 --- [taawoniyate] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 536 ms
+2025-05-26T02:56:46.551+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-05-26T02:56:46.553+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-05-26T02:56:46.561+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-05-26T02:56:46.562+01:00  INFO 18188 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2025-05-26T02:56:47.571+01:00  INFO 18188 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection org.postgresql.jdbc.PgConnection@25830b11
+2025-05-26T02:56:47.572+01:00  INFO 18188 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2025-05-26T02:56:47.676+01:00  WARN 18188 --- [taawoniyate] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-05-26T02:56:47.868+01:00  INFO 18188 --- [taawoniyate] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-3)']
+	Database driver: undefined/unknown
+	Database version: 17.5
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-05-26T02:56:48.107+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-05-26T02:56:51.885+01:00  INFO 18188 --- [taawoniyate] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-05-26T02:56:52.087+01:00  INFO 18188 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.aspect.LoggingAspect    : Entering: Cloudinary esi.ma.taawoniyate.config.CloudinaryConfig.cloudinary() with arguments = []
+2025-05-26T02:56:52.088+01:00  INFO 18188 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.aspect.LoggingAspect    : Exiting: Cloudinary esi.ma.taawoniyate.config.CloudinaryConfig.cloudinary() with result = com.cloudinary.Cloudinary@58abcb8d
+2025-05-26T02:56:52.207+01:00  WARN 18188 --- [taawoniyate] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-05-26T02:56:52.468+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-05-26T02:56:52.481+01:00  INFO 18188 --- [taawoniyate] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-05-26T02:56:52.485+01:00  INFO 18188 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : Started TaawoniyateApplication in 6.563 seconds (process running for 1242.453)
+2025-05-26T02:56:52.486+01:00  INFO 18188 --- [taawoniyate] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-05-26T02:57:00.631+01:00  INFO 18188 --- [taawoniyate] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-05-26T02:57:00.872+01:00  INFO 18188 --- [taawoniyate] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-05-26T02:57:00.875+01:00  INFO 18188 --- [taawoniyate] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-05-26T02:57:00.876+01:00  INFO 18188 --- [taawoniyate] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown initiated...
+2025-05-26T02:57:01.836+01:00  INFO 18188 --- [taawoniyate] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown completed.
+2025-05-26T02:57:04.253+01:00  INFO 9100 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : Starting TaawoniyateApplication using Java 17.0.12 with PID 9100 (C:\Users\pc\Documents\taawoniyate\target\classes started by pc in C:\Users\pc\Documents\taawoniyate)
+2025-05-26T02:57:04.256+01:00  INFO 9100 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-05-26T02:57:04.305+01:00  INFO 9100 --- [taawoniyate] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-05-26T02:57:04.305+01:00  INFO 9100 --- [taawoniyate] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-05-26T02:57:04.992+01:00  INFO 9100 --- [taawoniyate] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-05-26T02:57:05.063+01:00  INFO 9100 --- [taawoniyate] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 62 ms. Found 8 JPA repository interfaces.
+2025-05-26T02:57:05.770+01:00  INFO 9100 --- [taawoniyate] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-05-26T02:57:05.785+01:00  INFO 9100 --- [taawoniyate] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-05-26T02:57:05.785+01:00  INFO 9100 --- [taawoniyate] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+2025-05-26T02:57:05.855+01:00  INFO 9100 --- [taawoniyate] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-05-26T02:57:05.856+01:00  INFO 9100 --- [taawoniyate] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1549 ms
+2025-05-26T02:57:06.052+01:00  INFO 9100 --- [taawoniyate] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-05-26T02:57:06.142+01:00  INFO 9100 --- [taawoniyate] [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.13.Final
+2025-05-26T02:57:06.219+01:00  INFO 9100 --- [taawoniyate] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-05-26T02:57:06.603+01:00  INFO 9100 --- [taawoniyate] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-05-26T02:57:06.653+01:00  INFO 9100 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-05-26T02:57:07.981+01:00  INFO 9100 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7718b8e7
+2025-05-26T02:57:07.982+01:00  INFO 9100 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-05-26T02:57:08.126+01:00  WARN 9100 --- [taawoniyate] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-05-26T02:57:08.336+01:00  INFO 9100 --- [taawoniyate] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.5
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-05-26T02:57:09.681+01:00  INFO 9100 --- [taawoniyate] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-05-26T02:57:13.399+01:00  INFO 9100 --- [taawoniyate] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-05-26T02:57:13.752+01:00  INFO 9100 --- [taawoniyate] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-05-26T02:57:14.235+01:00  INFO 9100 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.aspect.LoggingAspect    : Entering: Cloudinary esi.ma.taawoniyate.config.CloudinaryConfig.cloudinary() with arguments = []
+2025-05-26T02:57:14.243+01:00  INFO 9100 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.aspect.LoggingAspect    : Exiting: Cloudinary esi.ma.taawoniyate.config.CloudinaryConfig.cloudinary() with result = com.cloudinary.Cloudinary@51d8b9a7
+2025-05-26T02:57:14.385+01:00  WARN 9100 --- [taawoniyate] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-05-26T02:57:14.888+01:00  INFO 9100 --- [taawoniyate] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-05-26T02:57:14.929+01:00  INFO 9100 --- [taawoniyate] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-05-26T02:57:14.938+01:00  INFO 9100 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : Started TaawoniyateApplication in 11.174 seconds (process running for 11.919)
+2025-05-26T02:57:49.150+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-05-26T02:57:49.150+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-05-26T02:57:49.151+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-05-26T02:57:49.202+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-1] e.ma.taawoniyate.aspect.LoggingAspect    : Entering: ResponseEntity esi.ma.taawoniyate.controller.ProductController.uploadProductImage(Long,MultipartFile) with arguments = [152, org.springframework.web.multipart.support.StandardMultipartHttpServletRequest$StandardMultipartFile@4ba77cc7]
+2025-05-26T02:57:49.204+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-1] e.ma.taawoniyate.aspect.LoggingAspect    : Entering: Optional org.springframework.data.repository.CrudRepository.findById(Object) with arguments = [152]
+2025-05-26T02:57:49.630+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-1] e.ma.taawoniyate.aspect.LoggingAspect    : Exiting: Optional org.springframework.data.repository.CrudRepository.findById(Object) with result = Optional[Product(id=152, category=Huile d'Argane Vierge - 100ml, name=Nom du produit, description=Description du produit, price=99.99, quantity=10, images=[https://res.cloudinary.com/duaps7z9m/image/upload/v1748224262/fav4az8dvbchducclonr.jpg], seller=Atlas Honey Cooperative, panierItems=[])]
+2025-05-26T02:57:50.018+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-1] e.ma.taawoniyate.aspect.LoggingAspect    : Entering: String esi.ma.taawoniyate.service.CloudinaryService.uploadFile(MultipartFile) with arguments = [org.springframework.web.multipart.support.StandardMultipartHttpServletRequest$StandardMultipartFile@4ba77cc7]
+2025-05-26T02:57:51.593+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-1] e.ma.taawoniyate.aspect.LoggingAspect    : Exiting: String esi.ma.taawoniyate.service.CloudinaryService.uploadFile(MultipartFile) with result = https://res.cloudinary.com/duaps7z9m/image/upload/v1748224670/avjmhfry5tlidlxlv5rh.jpg
+2025-05-26T02:57:51.595+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-1] e.ma.taawoniyate.aspect.LoggingAspect    : Entering: Object org.springframework.data.repository.CrudRepository.save(Object) with arguments = [esi.ma.taawoniyate.model.ProductImage@20b63163]
+2025-05-26T02:57:51.852+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-1] e.ma.taawoniyate.aspect.LoggingAspect    : Exiting: Object org.springframework.data.repository.CrudRepository.save(Object) with result = esi.ma.taawoniyate.model.ProductImage@20b63163
+2025-05-26T02:57:51.858+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-1] e.ma.taawoniyate.aspect.LoggingAspect    : Exiting: ResponseEntity esi.ma.taawoniyate.controller.ProductController.uploadProductImage(Long,MultipartFile) with result = <200 OK OK,https://res.cloudinary.com/duaps7z9m/image/upload/v1748224670/avjmhfry5tlidlxlv5rh.jpg,[]>
+2025-05-26T02:58:09.170+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-3] e.ma.taawoniyate.aspect.LoggingAspect    : Entering: List esi.ma.taawoniyate.controller.StoreController.getAllProducts() with arguments = []
+2025-05-26T02:58:09.170+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-3] e.ma.taawoniyate.aspect.LoggingAspect    : Entering: List org.springframework.data.repository.ListCrudRepository.findAll() with arguments = []
+2025-05-26T02:58:09.488+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-3] e.ma.taawoniyate.aspect.LoggingAspect    : Exiting: List org.springframework.data.repository.ListCrudRepository.findAll() with result = [Product(id=102, category=Huile d'Argane Vierge - 100ml, name=Atlas Mountain Wild Honey, description=Pure wildflower honey harvested from the Atlas Mountains, rich in natural enzymes and antioxidants, price=180.0, quantity=50, images=[https://res.cloudinary.com/duaps7z9m/image/upload/v1748136254/sncvowgzoucpadqwcxdw.jpg, https://res.cloudinary.com/duaps7z9m/image/upload/v1748136307/xv2izgj68v1bdto1llx8.jpg, https://res.cloudinary.com/duaps7z9m/image/upload/v1748223861/y8bjpofmd1v4yramvoar.jpg], seller=Argan Heritage, panierItems=[]), Product(id=103, category=Huile d'Argane Vierge - 100ml, name=Organic Acacia Honey, description=Light colored premium acacia honey with delicate floral taste, perfect for daily consumption, price=150.0, quantity=30, images=[https://res.cloudinary.com/duaps7z9m/image/upload/v1748223989/fuifge9rea845pittusi.jpg], seller=Atlas Honey Cooperative, panierItems=[esi.ma.taawoniyate.model.PanierItem@5a6a665f]), Product(id=104, category=Honey & Bee Products, name=Organic Acacia Honey, description=Light colored premium acacia honey with delicate floral taste, perfect for daily consumption, price=150.0, quantity=30, images=[], seller=Atlas Honey Cooperative, panierItems=[esi.ma.taawoniyate.model.PanierItem@31def692]), Product(id=152, category=Huile d'Argane Vierge - 100ml, name=Nom du produit, description=Description du produit, price=99.99, quantity=10, images=[https://res.cloudinary.com/duaps7z9m/image/upload/v1748224262/fav4az8dvbchducclonr.jpg, https://res.cloudinary.com/duaps7z9m/image/upload/v1748224670/avjmhfry5tlidlxlv5rh.jpg], seller=Atlas Honey Cooperative, panierItems=[])]
+2025-05-26T02:58:10.710+01:00  INFO 9100 --- [taawoniyate] [http-nio-8080-exec-3] e.ma.taawoniyate.aspect.LoggingAspect    : Exiting: List esi.ma.taawoniyate.controller.StoreController.getAllProducts() with result = [Product(id=102, category=Huile d'Argane Vierge - 100ml, name=Atlas Mountain Wild Honey, description=Pure wildflower honey harvested from the Atlas Mountains, rich in natural enzymes and antioxidants, price=180.0, quantity=50, images=[https://res.cloudinary.com/duaps7z9m/image/upload/v1748136254/sncvowgzoucpadqwcxdw.jpg, https://res.cloudinary.com/duaps7z9m/image/upload/v1748136307/xv2izgj68v1bdto1llx8.jpg, https://res.cloudinary.com/duaps7z9m/image/upload/v1748223861/y8bjpofmd1v4yramvoar.jpg], seller=Argan Heritage, panierItems=[]), Product(id=103, category=Huile d'Argane Vierge - 100ml, name=Organic Acacia Honey, description=Light colored premium acacia honey with delicate floral taste, perfect for daily consumption, price=150.0, quantity=30, images=[https://res.cloudinary.com/duaps7z9m/image/upload/v1748223989/fuifge9rea845pittusi.jpg], seller=Atlas Honey Cooperative, panierItems=[esi.ma.taawoniyate.model.PanierItem@5a6a665f]), Product(id=104, category=Honey & Bee Products, name=Organic Acacia Honey, description=Light colored premium acacia honey with delicate floral taste, perfect for daily consumption, price=150.0, quantity=30, images=[], seller=Atlas Honey Cooperative, panierItems=[esi.ma.taawoniyate.model.PanierItem@31def692]), Product(id=152, category=Huile d'Argane Vierge - 100ml, name=Nom du produit, description=Description du produit, price=99.99, quantity=10, images=[https://res.cloudinary.com/duaps7z9m/image/upload/v1748224262/fav4az8dvbchducclonr.jpg, https://res.cloudinary.com/duaps7z9m/image/upload/v1748224670/avjmhfry5tlidlxlv5rh.jpg], seller=Atlas Honey Cooperative, panierItems=[])]
+2025-05-26T03:19:50.818+01:00  INFO 9100 --- [taawoniyate] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-05-26T03:19:51.063+01:00  INFO 9100 --- [taawoniyate] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-05-26T03:19:51.075+01:00  INFO 9100 --- [taawoniyate] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-05-26T03:19:51.084+01:00  INFO 9100 --- [taawoniyate] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-05-26T03:19:51.092+01:00  INFO 9100 --- [taawoniyate] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-05-26T03:19:55.159+01:00  INFO 27652 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : Starting TaawoniyateApplication using Java 17.0.12 with PID 27652 (C:\Users\pc\Documents\taawoniyate\target\classes started by pc in C:\Users\pc\Documents\taawoniyate)
+2025-05-26T03:19:55.161+01:00  INFO 27652 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-05-26T03:19:55.208+01:00  INFO 27652 --- [taawoniyate] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-05-26T03:19:55.209+01:00  INFO 27652 --- [taawoniyate] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-05-26T03:19:55.973+01:00  INFO 27652 --- [taawoniyate] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-05-26T03:19:56.059+01:00  INFO 27652 --- [taawoniyate] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 75 ms. Found 8 JPA repository interfaces.
+2025-05-26T03:19:56.843+01:00  INFO 27652 --- [taawoniyate] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-05-26T03:19:56.858+01:00  INFO 27652 --- [taawoniyate] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-05-26T03:19:56.858+01:00  INFO 27652 --- [taawoniyate] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+2025-05-26T03:19:56.904+01:00  INFO 27652 --- [taawoniyate] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-05-26T03:19:56.904+01:00  INFO 27652 --- [taawoniyate] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1695 ms
+2025-05-26T03:19:57.082+01:00  INFO 27652 --- [taawoniyate] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-05-26T03:19:57.160+01:00  INFO 27652 --- [taawoniyate] [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.13.Final
+2025-05-26T03:19:57.232+01:00  INFO 27652 --- [taawoniyate] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-05-26T03:19:57.519+01:00  INFO 27652 --- [taawoniyate] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-05-26T03:19:57.554+01:00  INFO 27652 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-05-26T03:19:58.940+01:00  INFO 27652 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3762d785
+2025-05-26T03:19:58.943+01:00  INFO 27652 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-05-26T03:19:59.131+01:00  WARN 27652 --- [taawoniyate] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-05-26T03:19:59.349+01:00  INFO 27652 --- [taawoniyate] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.5
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-05-26T03:20:00.677+01:00  INFO 27652 --- [taawoniyate] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-05-26T03:20:04.340+01:00  INFO 27652 --- [taawoniyate] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-05-26T03:20:04.675+01:00  INFO 27652 --- [taawoniyate] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-05-26T03:20:05.154+01:00  INFO 27652 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.aspect.LoggingAspect    : Entering: Cloudinary esi.ma.taawoniyate.config.CloudinaryConfig.cloudinary() with arguments = []
+2025-05-26T03:20:05.162+01:00  INFO 27652 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.aspect.LoggingAspect    : Exiting: Cloudinary esi.ma.taawoniyate.config.CloudinaryConfig.cloudinary() with result = com.cloudinary.Cloudinary@771cfb07
+2025-05-26T03:20:05.240+01:00  INFO 27652 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.aspect.LoggingAspect    : Entering: WebMvcConfigurer esi.ma.taawoniyate.config.WebConfig.corsConfigurer() with arguments = []
+2025-05-26T03:20:05.241+01:00  INFO 27652 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.aspect.LoggingAspect    : Exiting: WebMvcConfigurer esi.ma.taawoniyate.config.WebConfig.corsConfigurer() with result = esi.ma.taawoniyate.config.WebConfig$1@193e96af
+2025-05-26T03:20:05.299+01:00  WARN 27652 --- [taawoniyate] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-05-26T03:20:05.805+01:00  INFO 27652 --- [taawoniyate] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-05-26T03:20:05.844+01:00  INFO 27652 --- [taawoniyate] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-05-26T03:20:05.854+01:00  INFO 27652 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : Started TaawoniyateApplication in 11.18 seconds (process running for 11.89)
+2025-05-26T03:22:44.516+01:00  INFO 27652 --- [taawoniyate] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-05-26T03:22:44.763+01:00  INFO 27652 --- [taawoniyate] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-05-26T03:22:44.769+01:00  INFO 27652 --- [taawoniyate] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-05-26T03:22:44.773+01:00  INFO 27652 --- [taawoniyate] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-05-26T03:22:45.703+01:00  INFO 27652 --- [taawoniyate] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-05-26T03:22:48.419+01:00  INFO 2796 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : Starting TaawoniyateApplication using Java 17.0.12 with PID 2796 (C:\Users\pc\Documents\taawoniyate\target\classes started by pc in C:\Users\pc\Documents\taawoniyate)
+2025-05-26T03:22:48.423+01:00  INFO 2796 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-05-26T03:22:48.472+01:00  INFO 2796 --- [taawoniyate] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-05-26T03:22:48.472+01:00  INFO 2796 --- [taawoniyate] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-05-26T03:22:49.181+01:00  INFO 2796 --- [taawoniyate] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-05-26T03:22:49.253+01:00  INFO 2796 --- [taawoniyate] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 62 ms. Found 8 JPA repository interfaces.
+2025-05-26T03:22:49.961+01:00  INFO 2796 --- [taawoniyate] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-05-26T03:22:49.976+01:00  INFO 2796 --- [taawoniyate] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-05-26T03:22:49.977+01:00  INFO 2796 --- [taawoniyate] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+2025-05-26T03:22:50.025+01:00  INFO 2796 --- [taawoniyate] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-05-26T03:22:50.026+01:00  INFO 2796 --- [taawoniyate] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1553 ms
+2025-05-26T03:22:50.203+01:00  INFO 2796 --- [taawoniyate] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-05-26T03:22:50.276+01:00  INFO 2796 --- [taawoniyate] [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.13.Final
+2025-05-26T03:22:50.342+01:00  INFO 2796 --- [taawoniyate] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-05-26T03:22:50.641+01:00  INFO 2796 --- [taawoniyate] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-05-26T03:22:50.683+01:00  INFO 2796 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-05-26T03:22:52.049+01:00  INFO 2796 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3c0df65c
+2025-05-26T03:22:52.052+01:00  INFO 2796 --- [taawoniyate] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-05-26T03:22:52.187+01:00  WARN 2796 --- [taawoniyate] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-05-26T03:22:52.407+01:00  INFO 2796 --- [taawoniyate] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.5
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-05-26T03:22:53.637+01:00  INFO 2796 --- [taawoniyate] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-05-26T03:22:57.311+01:00  INFO 2796 --- [taawoniyate] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-05-26T03:22:57.657+01:00  INFO 2796 --- [taawoniyate] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-05-26T03:22:58.130+01:00  INFO 2796 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.aspect.LoggingAspect    : Entering: Cloudinary esi.ma.taawoniyate.config.CloudinaryConfig.cloudinary() with arguments = []
+2025-05-26T03:22:58.138+01:00  INFO 2796 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.aspect.LoggingAspect    : Exiting: Cloudinary esi.ma.taawoniyate.config.CloudinaryConfig.cloudinary() with result = com.cloudinary.Cloudinary@6a68ca92
+2025-05-26T03:22:58.222+01:00  INFO 2796 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.aspect.LoggingAspect    : Entering: WebMvcConfigurer esi.ma.taawoniyate.config.WebConfig.corsConfigurer() with arguments = []
+2025-05-26T03:22:58.223+01:00  INFO 2796 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.aspect.LoggingAspect    : Exiting: WebMvcConfigurer esi.ma.taawoniyate.config.WebConfig.corsConfigurer() with result = esi.ma.taawoniyate.config.WebConfig$1@3d68cb04
+2025-05-26T03:22:58.284+01:00  WARN 2796 --- [taawoniyate] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-05-26T03:22:58.782+01:00  INFO 2796 --- [taawoniyate] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-05-26T03:22:58.821+01:00  INFO 2796 --- [taawoniyate] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-05-26T03:22:58.832+01:00  INFO 2796 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : Started TaawoniyateApplication in 10.881 seconds (process running for 11.658)
