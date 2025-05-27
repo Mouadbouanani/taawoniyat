@@ -13,7 +13,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/store/**") // Apply CORS to endpoints under /store
-                        .allowedOrigins("http://localhost:8081") // Or allowedOrigins("*")
+                        .allowedOrigins("http://localhost:8085") // Or allowedOrigins("*")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*");
             }

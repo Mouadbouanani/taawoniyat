@@ -88,7 +88,7 @@ public class StoreController {
         }
 
         // Validate the seller exists in the database
-        Seller seller = sellerRepository.findById((int) currentSeller.getId()).orElse(null);
+        Seller seller = sellerRepository.findById(currentSeller.getId()).orElse(null);
         if (seller == null) {
             response.put("success", false);
             response.put("message", "Seller not found in database");

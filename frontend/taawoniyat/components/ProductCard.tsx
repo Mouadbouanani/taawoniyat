@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { ThemedText } from './ThemedText';
