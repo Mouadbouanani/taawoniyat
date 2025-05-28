@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TextInput, ScrollView, TouchableOpacity } from 'react-native';
-import { ThemedText } from './ThemedText';
+import { ThemedText } from '../components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
-
-interface Category {
-  id: number;
-  name: string;
-}
 
 interface SearchAndCategoriesProps {
   onSearch: (query: string) => void;
@@ -15,7 +10,7 @@ interface SearchAndCategoriesProps {
 
 export function SearchAndCategories({ onSearch, onCategorySelect }: SearchAndCategoriesProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
@@ -28,19 +23,23 @@ export function SearchAndCategories({ onSearch, onCategorySelect }: SearchAndCat
       if (!response.ok) {
         throw new Error('Failed to fetch categories');
       }
-      const data = await response.json();
-      setCategories(data);
+      const data: string[] = await response.json();
+      console.log('Fetched categories:', data);
+
+      // Add "All" category at the beginning if it's not already there
+      const categoriesWithAll = data.includes('All') ? data : ['All', ...data];
+      setCategories(categoriesWithAll);
     } catch (error) {
       console.error('Error fetching categories:', error);
       // Fallback to mock categories if API fails
       setCategories([
-        { id: 1, name: 'All' },
-        { id: 2, name: 'Oils' },
-        { id: 3, name: 'Spices' },
-        { id: 4, name: 'Beauty' },
-        { id: 5, name: 'Teas' },
-        { id: 6, name: 'Honey' },
-        { id: 7, name: 'Herbs' },
+        'All',
+        'Oils',
+        'Spices',
+        'Beauty',
+        'Teas',
+        'Honey',
+        'Herbs',
       ]);
     }
   };
@@ -67,28 +66,28 @@ export function SearchAndCategories({ onSearch, onCategorySelect }: SearchAndCat
           placeholderTextColor="#8B4513"
         />
       </View>
-      
-      <ScrollView 
-        horizontal 
+
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.categoriesContainer}
       >
-        {categories.map((category) => (
+        {categories.map((category, index) => (
           <TouchableOpacity
-            key={category.id}
+            key={`${category}-${index}`}
             style={[
               styles.categoryButton,
-              selectedCategory === category.name && styles.selectedCategory
+              selectedCategory === category && styles.selectedCategory
             ]}
-            onPress={() => handleCategorySelect(category.name)}
+            onPress={() => handleCategorySelect(category)}
           >
             <ThemedText
               style={[
                 styles.categoryText,
-                selectedCategory === category.name && styles.selectedCategoryText
+                selectedCategory === category && styles.selectedCategoryText
               ]}
             >
-              {category.name}
+              {category}
             </ThemedText>
           </TouchableOpacity>
         ))}
@@ -156,4 +155,4 @@ const styles = StyleSheet.create({
   selectedCategoryText: {
     color: '#FFF8DC', // Cornsilk color
   },
-}); 
+});

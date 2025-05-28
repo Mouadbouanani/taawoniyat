@@ -30,6 +30,7 @@ export interface AuthResponse {
   success: boolean;
   message: string;
   user?: User;
+  token?: string;
 }
 
 export interface OrderItem {
@@ -55,6 +56,16 @@ export interface Order {
 
 export const authService = (() => {
   const USER_KEY = 'user';
+  const TOKEN_KEY = 'auth_token';
+
+  // Helper function to get auth headers
+  const getAuthHeaders = async () => {
+    const token = await AsyncStorage.getItem(TOKEN_KEY);
+    return {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    };
+  };
 
   return {
     login: async (email: string, password: string): Promise<AuthResponse> => {
@@ -73,7 +84,10 @@ export const authService = (() => {
           if (data.user) {
              await AsyncStorage.setItem(USER_KEY, JSON.stringify(data.user));
           }
-          return { success: true, message: data.message || 'Login successful', user: data.user };
+          if (data.token) {
+             await AsyncStorage.setItem(TOKEN_KEY, data.token);
+          }
+          return { success: true, message: data.message || 'Login successful', user: data.user, token: data.token };
         } else {
            const message = data.message || 'Authentication failed';
            console.error('Login failed:', response.status, message);
@@ -96,12 +110,14 @@ export const authService = (() => {
         }
 
         await AsyncStorage.removeItem(USER_KEY);
+        await AsyncStorage.removeItem(TOKEN_KEY);
 
         console.log('User logged out.');
 
       } catch (error) {
         console.error('Logout error:', error);
         await AsyncStorage.removeItem(USER_KEY);
+        await AsyncStorage.removeItem(TOKEN_KEY);
       }
     },
 
@@ -110,7 +126,9 @@ export const authService = (() => {
         const userJson = await AsyncStorage.getItem(USER_KEY);
         const localUser: User | null = userJson ? JSON.parse(userJson) : null;
 
+        const headers = await getAuthHeaders();
         const response = await fetch(`${API_BASE_URL}/me`, {
+          headers
         });
 
         if (response.ok) {
@@ -118,8 +136,9 @@ export const authService = (() => {
            await AsyncStorage.setItem(USER_KEY, JSON.stringify(backendUser));
            return backendUser;
         } else if (response.status === 401) {
-           console.log('Session expired or user not authenticated on backend.');
-           await AsyncStorage.removeItem(USER_KEY); // Clear stale local data
+           console.log('Token expired or user not authenticated on backend.');
+           await AsyncStorage.removeItem(USER_KEY);
+           await AsyncStorage.removeItem(TOKEN_KEY);
            return null;
         } else {
            console.error('Failed to fetch user details from backend:', response.status, await response.text());
@@ -135,11 +154,25 @@ export const authService = (() => {
 
     isAuthenticated: async (): Promise<boolean> => {
       try {
-        const response = await fetch(`${API_BASE_URL}/validate-session`, {
+        const token = await AsyncStorage.getItem(TOKEN_KEY);
+        if (!token) {
+          return false;
+        }
+
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${API_BASE_URL}/me`, {
            method: 'GET',
+           headers
         });
 
-        return response.ok; // True if status is 2xx, false otherwise (including 401)
+        if (response.status === 401) {
+          // Token is invalid, clear it
+          await AsyncStorage.removeItem(TOKEN_KEY);
+          await AsyncStorage.removeItem(USER_KEY);
+          return false;
+        }
+
+        return response.ok; // True if status is 2xx, false otherwise
 
       } catch (error) {
         console.error('Authentication check error:', error);
@@ -230,73 +263,7 @@ export const authService = (() => {
        }
     },
 
-    getSellerProducts: async (): Promise<Product[] | null> => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/seller/products`, {
-        });
 
-        if (response.ok) {
-          return await response.json();
-        } else if (response.status === 401) {
-           console.log('Session invalid for getSellerProducts.');
-           return null; // Not authenticated
-        } else {
-          console.error('Failed to fetch seller products:', response.status, await response.text());
-          return null; // Indicate failure
-        }
-      } catch (error) {
-        console.error('Get seller products error:', error);
-        return null; // Return null on error
-      }
-    },
-
-    getClientOrders: async (): Promise<Order[] | null> => {
-      try {
-        const response = await fetch(`http://localhost:8080/api/orders/me`, {
-        });
-
-        if (response.ok) {
-          const orders: Order[] = await response.json();
-          console.log('Fetched client orders:', orders);
-          return orders;
-
-        } else if (response.status === 401) {
-           console.log('Session invalid for getClientOrders.');
-           return null; // Not authenticated
-        } else {
-          console.error('Failed to fetch client orders:', response.status, await response.text());
-          return null;
-        }
-
-      } catch (error) {
-        console.error('Error fetching client orders:', error);
-        return null;
-      }
-    },
-
-    getSellerOrders: async (): Promise<Order[] | null> => {
-      try {
-         const response = await fetch(`http://localhost:8080/api/seller/orders`, {
-         });
-
-        if (response.ok) {
-          const orders: Order[] = await response.json();
-          console.log('Fetched seller orders:', orders);
-          return orders;
-
-        } else if (response.status === 401) {
-           console.log('Session invalid for getSellerOrders.');
-           return null; // Not authenticated
-        } else {
-          console.error('Failed to fetch seller orders:', response.status, await response.text());
-          return null;
-        }
-
-      } catch (error) {
-        console.error('Error fetching seller orders:', error);
-        return null;
-      }
-    },
 
     addSellerProduct: async (productData: {
       name: string;
@@ -308,7 +275,7 @@ export const authService = (() => {
       try {
         console.log('Sending add product request (session-based):', productData); // Log data being sent
 
-        const response = await fetch('http://localhost:8080/store/addProduct', {
+        const response = await fetch('http://localhost:8080/store/addProductSimple', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -317,7 +284,7 @@ export const authService = (() => {
             name: productData.name,
             description: productData.description,
             price: productData.price,
-            category: { name: productData.category },
+            category: productData.category,
             quantity: productData.quantity,
           }),
         });
@@ -387,9 +354,381 @@ export const authService = (() => {
     },
 
     deleteSellerProduct: async (productId: number): Promise<boolean> => {
-      console.log('Placeholder for deleteSellerProduct', productId);
-      // TODO: Implement API call
-      return true; // Simulate success
+      try {
+        console.log(`Deleting product with ID: ${productId}`);
+
+        const headers = await getAuthHeaders();
+        if (!headers.Authorization) {
+          console.error('No authentication token available');
+          return false;
+        }
+
+        const response = await fetch(`http://localhost:8080/api/products/${productId}`, {
+          method: 'DELETE',
+          headers: headers,
+        });
+
+        console.log('Delete product response status:', response.status);
+
+        if (response.ok) {
+          console.log('Product deleted successfully');
+          return true;
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to delete product:', errorText);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error deleting product:', error);
+        return false;
+      }
+    },
+
+    // Update user information
+    updateUserInfo: async (userInfo: {
+      fullName: string;
+      email: string;
+      phone: string;
+      address: string;
+      city: string;
+      region: string;
+    }): Promise<boolean> => {
+      try {
+        console.log('Updating user information:', userInfo);
+
+        const headers = await getAuthHeaders();
+        if (!headers.Authorization) {
+          console.error('No authentication token available');
+          return false;
+        }
+
+        const response = await fetch('http://localhost:8080/api/users/update-info', {
+          method: 'POST',
+          headers: {
+            ...headers,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userInfo),
+        });
+
+        console.log('Update user info response status:', response.status);
+
+        if (response.ok) {
+          console.log('User information updated successfully');
+          return true;
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to update user information:', errorText);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error updating user information:', error);
+        return false;
+      }
+    },
+
+    // New JWT-authenticated method for adding products with images
+    addProductWithImages: async (productData: {
+      name: string;
+      description: string;
+      price: number;
+      category: string;
+      quantity: number;
+    }, images?: File[]): Promise<Product | null> => {
+      try {
+        console.log('Adding product with images using JWT authentication:', productData);
+
+        const headers = await getAuthHeaders();
+        const formData = new FormData();
+
+        // Add product data
+        formData.append('name', productData.name);
+        formData.append('description', productData.description);
+        formData.append('price', productData.price.toString());
+        formData.append('category', productData.category);
+        formData.append('quantity', productData.quantity.toString());
+
+        // Add images if provided
+        if (images && images.length > 0) {
+          images.forEach((image) => {
+            formData.append('images', image);
+          });
+          console.log(`Adding ${images.length} images to the request`);
+        }
+
+        const response = await fetch('http://localhost:8080/api/products/add-with-images-jwt', {
+          method: 'POST',
+          headers: {
+            // Don't set Content-Type for FormData, let the browser set it with boundary
+            'Authorization': headers.Authorization || ''
+          },
+          body: formData,
+        });
+
+        console.log('Add product with images response. Status:', response.status, 'OK:', response.ok);
+
+        if (response.ok) {
+          const newProduct: Product = await response.json();
+          console.log('Product added successfully with images:', newProduct);
+          return newProduct;
+        } else if (response.status === 401) {
+          console.log('Token invalid for addProductWithImages.');
+          await AsyncStorage.removeItem(TOKEN_KEY);
+          await AsyncStorage.removeItem(USER_KEY);
+          return null;
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to add product with images:', response.status, errorText);
+          return null;
+        }
+      } catch (error) {
+        console.error('Add product with images error:', error);
+        return null;
+      }
+    },
+
+    // Get seller products using JWT authentication
+    getSellerProducts: async (): Promise<Product[]> => {
+      try {
+        console.log('Fetching seller products...');
+
+        const headers = await getAuthHeaders();
+        if (!headers.Authorization) {
+          console.error('No authentication token available');
+          return [];
+        }
+
+        const response = await fetch('http://localhost:8080/api/users/seller/products-jwt', {
+          method: 'GET',
+          headers: headers,
+        });
+
+        console.log('Get seller products response status:', response.status);
+
+        if (response.ok) {
+          const products = await response.json();
+          console.log('Seller products fetched successfully:', products.length);
+          return products;
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to fetch seller products:', errorText);
+          return [];
+        }
+      } catch (error) {
+        console.error('Error fetching seller products:', error);
+        return [];
+      }
+    },
+
+
+
+    // Get client orders using JWT authentication
+    getClientOrders: async (): Promise<Order[]> => {
+      try {
+        console.log('Fetching client orders...');
+
+        const headers = await getAuthHeaders();
+        if (!headers.Authorization) {
+          console.error('No authentication token available');
+          return [];
+        }
+
+        const response = await fetch('http://localhost:8080/api/panier/client-orders', {
+          method: 'GET',
+          headers: headers,
+        });
+
+        console.log('Get client orders response status:', response.status);
+
+        if (response.ok) {
+          const orders = await response.json();
+          console.log('Client orders fetched successfully:', orders.length);
+          return orders;
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to fetch client orders:', errorText);
+          return [];
+        }
+      } catch (error) {
+        console.error('Error fetching client orders:', error);
+        return [];
+      }
+    },
+
+    // Update product with new information and images
+    updateProduct: async (
+      productId: number,
+      productData: {
+        name: string;
+        description: string;
+        price: number;
+        quantity: number;
+        category: string;
+      },
+      newImages: any[],
+      existingImages: string[]
+    ): Promise<boolean> => {
+      try {
+        console.log('Updating product:', productId, productData);
+
+        const headers = await getAuthHeaders();
+        if (!headers.Authorization) {
+          console.error('No authentication token available');
+          return false;
+        }
+
+        const formData = new FormData();
+
+        // Add basic product data
+        formData.append('name', productData.name);
+        formData.append('description', productData.description);
+        formData.append('price', productData.price.toString());
+        formData.append('quantity', productData.quantity.toString());
+        formData.append('category', productData.category);
+
+        // Debug: Log what we're sending
+        console.log('FormData contents:');
+        console.log('- name:', productData.name);
+        console.log('- description:', productData.description);
+        console.log('- price:', productData.price.toString());
+        console.log('- quantity:', productData.quantity.toString());
+        console.log('- category:', productData.category);
+
+        // Add existing images URLs
+        existingImages.forEach((imageUrl, index) => {
+          formData.append('existingImages', imageUrl);
+          console.log(`- existingImages[${index}]:`, imageUrl);
+        });
+
+        // Add new images - process them properly for web
+        for (let i = 0; i < newImages.length; i++) {
+          const image = newImages[i];
+          if (image.uri && image.uri.startsWith('blob:')) {
+            // For web, convert blob URL to File
+            try {
+              const response = await fetch(image.uri);
+              const blob = await response.blob();
+              const file = new File([blob], image.fileName || `image_${i}.jpg`, {
+                type: image.type || 'image/jpeg'
+              });
+              formData.append('newImages', file);
+              console.log(`- newImages[${i}]:`, file.name, file.type, file.size, 'bytes');
+            } catch (error) {
+              console.error('Error processing image blob:', error);
+            }
+          } else {
+            // For React Native, use the existing format
+            const imageFile = {
+              uri: image.uri,
+              type: image.type || 'image/jpeg',
+              name: image.fileName || `image_${i}.jpg`,
+            };
+            formData.append('newImages', imageFile as any);
+            console.log(`- newImages[${i}]:`, imageFile.name, imageFile.type);
+          }
+        }
+
+        console.log('Sending FormData with product data and', newImages.length, 'new images,', existingImages.length, 'existing images');
+
+        // Remove Content-Type from headers for FormData - let browser set it automatically
+        const { 'Content-Type': _, ...formDataHeaders } = headers;
+
+        const response = await fetch(`http://localhost:8080/api/products/update/${productId}`, {
+          method: 'PUT',
+          headers: formDataHeaders,
+          body: formData,
+        });
+
+        console.log('Update product response status:', response.status);
+
+        if (response.ok) {
+          console.log('Product updated successfully');
+          return true;
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to update product:', errorText);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error updating product:', error);
+        return false;
+      }
+    },
+
+    // Save cart items as panier in database
+    saveCartAsPanier: async (cartItems: any[]): Promise<boolean> => {
+      try {
+        console.log('Saving cart as panier:', cartItems);
+
+        const headers = await getAuthHeaders();
+        if (!headers.Authorization) {
+          console.error('No authentication token available');
+          return false;
+        }
+
+        // Transform cart items to panier format
+        const panierItems = cartItems.map(item => ({
+          productId: item.id,
+          quantity: item.quantity || 1,
+          price: item.price
+        }));
+
+        const response = await fetch('http://localhost:8080/api/panier/save-cart', {
+          method: 'POST',
+          headers: {
+            ...headers,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ items: panierItems }),
+        });
+
+        console.log('Save cart response status:', response.status);
+
+        if (response.ok) {
+          console.log('Cart saved as panier successfully');
+          return true;
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to save cart as panier:', errorText);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error saving cart as panier:', error);
+        return false;
+      }
+    },
+
+    // Get seller orders (for sellers to see orders containing their products)
+    getSellerOrders: async (): Promise<any[]> => {
+      try {
+        console.log('Fetching seller orders...');
+
+        const headers = await getAuthHeaders();
+        if (!headers.Authorization) {
+          console.error('No authentication token available');
+          return [];
+        }
+
+        const response = await fetch('http://localhost:8080/api/panier/seller-orders', {
+          method: 'GET',
+          headers: headers,
+        });
+
+        console.log('Get seller orders response status:', response.status);
+
+        if (response.ok) {
+          const orders = await response.json();
+          console.log('Seller orders fetched successfully:', orders.length, 'orders');
+          return orders;
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to fetch seller orders:', errorText);
+          return [];
+        }
+      } catch (error) {
+        console.error('Error fetching seller orders:', error);
+        return [];
+      }
     },
   };
 })();

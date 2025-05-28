@@ -25,6 +25,9 @@ public class Panier {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
+    @Transient
+    private long clientId;
+
     public Panier() {
         this.date = LocalDateTime.now();
     }
@@ -42,8 +45,8 @@ public class Panier {
         return formatter.format(date);
     }
 
-    public void setCreated_at(LocalDateTime created_at) {
-        this.date = created_at;
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 
     public List<Map<String, Object>> getItems() {
@@ -53,14 +56,10 @@ public class Panier {
             map.put("product", item.getProduct());
             map.put("quantity", item.getQuantity());
             map.put("price", item.getPrice());
+            map.put("seller", item.getSeller());
             result.add(map);
         }
         return result;
-    }
-
-    @JsonIgnore
-    public Set<PanierItem> getAllItems() {
-        return items;
     }
 
     public void setItems(Set<PanierItem> items) {
@@ -68,11 +67,19 @@ public class Panier {
     }
 
     public String getClient() {
-        return client.getFullName();
+        return client != null ? client.getFullName() : null;
     }
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public long getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(long clientId) {
+        this.clientId = clientId;
     }
 
     @JsonIgnore

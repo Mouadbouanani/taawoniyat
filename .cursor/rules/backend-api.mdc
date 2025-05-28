@@ -1,0 +1,1983 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Store
+  description: Store management APIs
+- name: Client
+  description: Client management APIs
+- name: User
+  description: User management APIs
+- name: Panier
+  description: Shopping cart management APIs
+- name: Product
+  description: Product management APIs
+- name: Seller
+  description: Seller management APIs
+- name: Admin
+  description: Admin management APIs
+paths:
+  /api/sellers/{id}:
+    get:
+      tags:
+      - Seller
+      summary: Get seller by ID
+      description: Retrieve a seller by their ID
+      operationId: getSellerById
+      parameters:
+      - name: id
+        in: path
+        description: ID of the seller to retrieve
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Seller found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Seller"
+        "404":
+          description: Seller not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Seller"
+    put:
+      tags:
+      - Seller
+      summary: Update a seller
+      description: Update an existing seller's information
+      operationId: updateSeller
+      parameters:
+      - name: id
+        in: path
+        description: ID of the seller to update
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Seller"
+        required: true
+      responses:
+        "200":
+          description: Seller updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Seller"
+        "404":
+          description: Seller not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Seller"
+        "400":
+          description: Invalid seller data
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Seller"
+    delete:
+      tags:
+      - Seller
+      summary: Delete a seller
+      description: Delete a seller by their ID
+      operationId: deleteSeller
+      parameters:
+      - name: id
+        in: path
+        description: ID of the seller to delete
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "204":
+          description: Seller deleted successfully
+        "404":
+          description: Seller not found
+  /api/clients/{id}:
+    get:
+      tags:
+      - Client
+      summary: Get client by ID
+      description: Retrieve a client by their ID
+      operationId: getClientById
+      parameters:
+      - name: id
+        in: path
+        description: ID of the client to retrieve
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Client found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+        "404":
+          description: Client not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+    put:
+      tags:
+      - Client
+      summary: Update a client
+      description: Update an existing client's information
+      operationId: updateClient
+      parameters:
+      - name: id
+        in: path
+        description: ID of the client to update
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Client"
+        required: true
+      responses:
+        "404":
+          description: Client not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+        "400":
+          description: Invalid client data
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+        "200":
+          description: Client updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+    delete:
+      tags:
+      - Client
+      summary: Delete a client
+      description: Delete a client by their ID
+      operationId: deleteClient
+      parameters:
+      - name: id
+        in: path
+        description: ID of the client to delete
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Client not found
+        "204":
+          description: Client deleted successfully
+  /store/addProduct:
+    post:
+      tags:
+      - Store
+      summary: Add a new product
+      description: Add a new product to the store
+      operationId: addProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+        required: true
+      responses:
+        "401":
+          description: Seller not logged in
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Invalid product data
+          content:
+            '*/*':
+              schema:
+                type: object
+        "200":
+          description: Product added successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+  /store/addCategory:
+    post:
+      tags:
+      - Store
+      summary: Add a new category
+      description: Create a new product category
+      operationId: createCategory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Category"
+        required: true
+      responses:
+        "200":
+          description: Category created successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Invalid category data
+          content:
+            '*/*':
+              schema:
+                type: object
+  /panier/save:
+    post:
+      tags:
+      - Panier
+      summary: Save shopping cart
+      description: Save a client's shopping cart
+      operationId: savePanier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Panier"
+        required: true
+      responses:
+        "200":
+          description: Shopping cart saved successfully
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: User not logged in
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/users/register/seller:
+    post:
+      tags:
+      - User
+      summary: Register seller
+      description: Register a new seller account
+      operationId: registerSeller
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Seller"
+        required: true
+      responses:
+        "409":
+          description: Email already exists
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "201":
+          description: Seller registered successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "500":
+          description: Registration failed
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "400":
+          description: Invalid seller data
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+  /api/users/register/client:
+    post:
+      tags:
+      - User
+      summary: Register client
+      description: Register a new client account
+      operationId: registerClient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Client"
+        required: true
+      responses:
+        "409":
+          description: Email already exists
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "400":
+          description: Invalid client data
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "500":
+          description: Registration failed
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "201":
+          description: Client registered successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+  /api/users/authenticate:
+    post:
+      tags:
+      - User
+      summary: Authenticate user
+      description: Authenticate a user with email and password
+      operationId: authenticateUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
+        required: true
+      responses:
+        "500":
+          description: Authentication failed
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "401":
+          description: Invalid email or password
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "200":
+          description: Authentication successful
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+  /api/sellers:
+    get:
+      tags:
+      - Seller
+      summary: Get all sellers
+      description: Retrieve a paginated list of all sellers
+      operationId: getAllSellers
+      parameters:
+      - name: page
+        in: query
+        description: Page number (0-based)
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        description: Number of items per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sortBy
+        in: query
+        description: Field to sort by
+        required: false
+        schema:
+          type: string
+          default: id
+      - name: sortDir
+        in: query
+        description: Sort direction (asc/desc)
+        required: false
+        schema:
+          type: string
+          default: asc
+      responses:
+        "200":
+          description: Successfully retrieved sellers
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageSeller"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageSeller"
+    post:
+      tags:
+      - Seller
+      summary: Create a new seller
+      description: Create a new seller account
+      operationId: createSeller
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Seller"
+        required: true
+      responses:
+        "400":
+          description: Invalid seller data
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Seller"
+        "201":
+          description: Seller created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Seller"
+  /api/products/{id}/upload-image:
+    post:
+      tags:
+      - Product
+      summary: Upload a product image
+      description: Upload an image for a specific product
+      operationId: uploadProductImage
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - image
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Product not found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Image uploaded successfully
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/products/{id}/favorite:
+    post:
+      tags:
+      - Product
+      summary: Toggle product favorite status
+      description: Add or remove a product from a client's favorites list
+      operationId: toggleFavorite
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "401":
+          description: User not authenticated or not a client
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "404":
+          description: Product not found
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "200":
+          description: Favorite status toggled successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+  /api/clients:
+    get:
+      tags:
+      - Client
+      summary: Get all clients
+      description: Retrieve a paginated list of all clients
+      operationId: getAllClients
+      parameters:
+      - name: page
+        in: query
+        description: Page number (0-based)
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        description: Number of items per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sortBy
+        in: query
+        description: Field to sort by
+        required: false
+        schema:
+          type: string
+          default: id
+      - name: sortDir
+        in: query
+        description: Sort direction (asc/desc)
+        required: false
+        schema:
+          type: string
+          default: asc
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageClient"
+        "200":
+          description: Successfully retrieved clients
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageClient"
+    post:
+      tags:
+      - Client
+      summary: Create a new client
+      description: Create a new client account
+      operationId: createClient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Client"
+        required: true
+      responses:
+        "201":
+          description: Client created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+        "409":
+          description: Client with this email already exists
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+        "400":
+          description: Invalid client data
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+  /api/clients/{clientId}/favorites:
+    get:
+      tags:
+      - Client
+      summary: Get favorite products
+      description: Get all favorite products for a client
+      operationId: getFavoriteProducts_1
+      parameters:
+      - name: clientId
+        in: path
+        description: ID of the client
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Successfully retrieved favorite products
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+        "404":
+          description: Client not found
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      tags:
+      - Client
+      summary: Add product to favorites
+      description: Add a product to a client's favorites list
+      operationId: addToFavorites
+      parameters:
+      - name: clientId
+        in: path
+        description: ID of the client
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+        required: true
+      responses:
+        "404":
+          description: Client not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+        "200":
+          description: Product added to favorites
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+        "400":
+          description: Invalid request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+    delete:
+      tags:
+      - Client
+      summary: Remove product from favorites
+      description: Remove a product from a client's favorites list
+      operationId: removeFromFavorites
+      parameters:
+      - name: clientId
+        in: path
+        description: ID of the client
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+        required: true
+      responses:
+        "200":
+          description: Product removed from favorites
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+        "404":
+          description: Client not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+        "400":
+          description: Invalid request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+  /store/{busnissName}/products:
+    get:
+      tags:
+      - Store
+      summary: Get products by business name
+      description: Get all products from a specific business
+      operationId: getBusnissNameProducts
+      parameters:
+      - name: busnissName
+        in: path
+        description: Name of the business
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved products
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+  /store/products:
+    get:
+      tags:
+      - Store
+      summary: Get all products
+      description: Retrieve a list of all products in the store
+      operationId: getAllProducts
+      responses:
+        "200":
+          description: Successfully retrieved products
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+  /store/products/search:
+    get:
+      tags:
+      - Store
+      summary: Search products
+      description: Search products by partial name match
+      operationId: searchProductsByName
+      parameters:
+      - name: keyword
+        in: query
+        description: Search keyword
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved products
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+  /store/products/name/{name}:
+    get:
+      tags:
+      - Store
+      summary: Get products by exact name
+      description: Find products by their exact name
+      operationId: getProductsByName
+      parameters:
+      - name: name
+        in: path
+        description: Exact name of the product
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved products
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+  /store/products/category/{name}:
+    get:
+      tags:
+      - Store
+      summary: Get products by category
+      description: Retrieve all products in a specific category
+      operationId: getProductsByCategoryName
+      parameters:
+      - name: name
+        in: path
+        description: Name of the category
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved products
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+  /store/category/{name}:
+    get:
+      tags:
+      - Store
+      summary: Get category by name
+      description: Find a category by its exact name
+      operationId: getCategoryByName
+      parameters:
+      - name: name
+        in: path
+        description: Name of the category
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Category found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Category"
+        "404":
+          description: Category not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Category"
+  /store/categories:
+    get:
+      tags:
+      - Store
+      summary: Get all categories
+      description: Retrieve a list of all category names
+      operationId: getAllCategories
+      responses:
+        "200":
+          description: Successfully retrieved categories
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+  /panier/history:
+    get:
+      tags:
+      - Panier
+      summary: Get shopping cart history
+      description: Get all shopping carts for the current client
+      operationId: getPaniers
+      responses:
+        "200":
+          description: Successfully retrieved shopping cart history
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Panier"
+        "401":
+          description: User not logged in
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Panier"
+  /api/users:
+    get:
+      tags:
+      - User
+      summary: Get all users
+      description: Retrieve a paginated list of all users
+      operationId: getAllUsers
+      parameters:
+      - name: page
+        in: query
+        description: Page number (0-based)
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        description: Number of items per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sortBy
+        in: query
+        description: Field to sort by
+        required: false
+        schema:
+          type: string
+          default: id
+      - name: sortDir
+        in: query
+        description: Sort direction (asc/desc)
+        required: false
+        schema:
+          type: string
+          default: asc
+      responses:
+        "200":
+          description: Successfully retrieved users
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageUser"
+  /api/users/{id}:
+    get:
+      tags:
+      - User
+      summary: Get user by ID
+      description: Find a user by their ID
+      operationId: getUserById
+      parameters:
+      - name: id
+        in: path
+        description: ID of the user
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: User found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/User"
+    delete:
+      tags:
+      - User
+      summary: Delete user
+      description: Delete a user by their ID
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        description: ID of the user to delete
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "204":
+          description: User deleted successfully
+        "404":
+          description: User not found
+  /api/users/region/{region}:
+    get:
+      tags:
+      - User
+      summary: Get users by region
+      description: Find all users in a specific region
+      operationId: getUsersByRegion
+      parameters:
+      - name: region
+        in: path
+        description: Region name
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved users
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+  /api/users/me:
+    get:
+      tags:
+      - User
+      summary: Get current user
+      description: Get the currently authenticated user
+      operationId: getCurrentUser
+      responses:
+        "200":
+          description: User found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: No user authenticated
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/User"
+  /api/users/me/favorites:
+    get:
+      tags:
+      - User
+      summary: Get favorite products
+      description: Get favorite products for the current client
+      operationId: getFavoriteProducts
+      responses:
+        "200":
+          description: Successfully retrieved favorite products
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "401":
+          description: User not authenticated or not a client
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+  /api/users/fullname/{fullName}:
+    get:
+      tags:
+      - User
+      summary: Get user by full name
+      description: Find a user by their full name
+      operationId: getUserByFullName
+      parameters:
+      - name: fullName
+        in: path
+        description: Full name of the user
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: User found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/User"
+  /api/users/exists/email/{email}:
+    get:
+      tags:
+      - User
+      summary: Check if email exists
+      description: Check if a user exists with the given email
+      operationId: checkEmailExists
+      parameters:
+      - name: email
+        in: path
+        description: Email to check
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully checked email existence
+          content:
+            '*/*':
+              schema:
+                type: boolean
+  /api/users/email/{email}:
+    get:
+      tags:
+      - User
+      summary: Get user by email
+      description: Find a user by their email address
+      operationId: getUserByEmail
+      parameters:
+      - name: email
+        in: path
+        description: Email of the user
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: User found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/User"
+  /api/users/city/{city}:
+    get:
+      tags:
+      - User
+      summary: Get users by city
+      description: Find all users in a specific city
+      operationId: getUsersByCity
+      parameters:
+      - name: city
+        in: path
+        description: City name
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved users
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+  /api/sellers/{id}/products:
+    get:
+      tags:
+      - Seller
+      summary: Get seller's products
+      description: Retrieve all products for a specific seller
+      operationId: getSellerProducts
+      parameters:
+      - name: id
+        in: path
+        description: ID of the seller
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Successfully retrieved products
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+        "404":
+          description: Seller not found
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+  /api/sellers/{id}/products/count:
+    get:
+      tags:
+      - Seller
+      summary: Get seller's product count
+      description: Get the total number of products for a seller
+      operationId: getProductCount
+      parameters:
+      - name: id
+        in: path
+        description: ID of the seller
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Successfully retrieved product count
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        "404":
+          description: Seller not found
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+  /api/sellers/my-panier-items:
+    get:
+      tags:
+      - Seller
+      summary: Get seller's panier items
+      description: Get all panier items for the currently logged-in seller
+      operationId: getMyPanierItems
+      responses:
+        "401":
+          description: Seller not logged in
+          content:
+            '*/*':
+              schema:
+                type: object
+        "200":
+          description: Successfully retrieved panier items
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/sellers/exists/{id}:
+    get:
+      tags:
+      - Seller
+      summary: Check if seller exists
+      description: Check if a seller exists by their ID
+      operationId: checkSellerExists
+      parameters:
+      - name: id
+        in: path
+        description: ID of the seller to check
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Successfully checked seller existence
+          content:
+            '*/*':
+              schema:
+                type: boolean
+  /api/sellers/business-name/{businessName}:
+    get:
+      tags:
+      - Seller
+      summary: Get sellers by business name
+      description: Find sellers by their business name
+      operationId: getSellersByBusinessName
+      parameters:
+      - name: businessName
+        in: path
+        description: Business name to search for
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved sellers
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Seller"
+  /api/clients/region/{region}:
+    get:
+      tags:
+      - Client
+      summary: Get clients by region
+      description: Get all clients in a specific region
+      operationId: getClientsByRegion
+      parameters:
+      - name: region
+        in: path
+        description: Region name
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved clients
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Client"
+  /api/clients/email/{email}:
+    get:
+      tags:
+      - Client
+      summary: Get client by email
+      description: Retrieve a client by their email address
+      operationId: getClientByEmail
+      parameters:
+      - name: email
+        in: path
+        description: Email of the client to retrieve
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Client found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+        "404":
+          description: Client not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Client"
+  /api/clients/city/{city}:
+    get:
+      tags:
+      - Client
+      summary: Get clients by city
+      description: Get all clients in a specific city
+      operationId: getClientsByCity
+      parameters:
+      - name: city
+        in: path
+        description: City name
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved clients
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Client"
+  /api/admin/users:
+    get:
+      tags:
+      - Admin
+      summary: Get all users
+      description: Retrieve a paginated list of all users
+      operationId: getAllUsers_1
+      parameters:
+      - name: page
+        in: query
+        description: Page number (0-based)
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        description: Number of items per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sortBy
+        in: query
+        description: Field to sort by
+        required: false
+        schema:
+          type: string
+          default: id
+      - name: sortDir
+        in: query
+        description: Sort direction (asc/desc)
+        required: false
+        schema:
+          type: string
+          default: asc
+      responses:
+        "200":
+          description: Successfully retrieved users
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageUser"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageUser"
+  /api/admin/statistics:
+    get:
+      tags:
+      - Admin
+      summary: Get system statistics
+      description: "Get statistics about users, clients, and sellers"
+      operationId: getStatistics
+      responses:
+        "200":
+          description: Successfully retrieved statistics
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/admin/sellers:
+    get:
+      tags:
+      - Admin
+      summary: Get all sellers
+      description: Retrieve a paginated list of all sellers
+      operationId: getAllSellers_1
+      parameters:
+      - name: page
+        in: query
+        description: Page number (0-based)
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        description: Number of items per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sortBy
+        in: query
+        description: Field to sort by
+        required: false
+        schema:
+          type: string
+          default: id
+      - name: sortDir
+        in: query
+        description: Sort direction (asc/desc)
+        required: false
+        schema:
+          type: string
+          default: asc
+      responses:
+        "200":
+          description: Successfully retrieved sellers
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageSeller"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageSeller"
+  /api/admin/clients:
+    get:
+      tags:
+      - Admin
+      summary: Get all clients
+      description: Retrieve a paginated list of all clients
+      operationId: getAllClients_1
+      parameters:
+      - name: page
+        in: query
+        description: Page number (0-based)
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        description: Number of items per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sortBy
+        in: query
+        description: Field to sort by
+        required: false
+        schema:
+          type: string
+          default: id
+      - name: sortDir
+        in: query
+        description: Sort direction (asc/desc)
+        required: false
+        schema:
+          type: string
+          default: asc
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageClient"
+        "200":
+          description: Successfully retrieved clients
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageClient"
+  /store/deleteProductByName/{name}:
+    delete:
+      tags:
+      - Store
+      summary: Delete product by name
+      description: Delete all products with a specific name
+      operationId: deleteProductByName
+      parameters:
+      - name: name
+        in: path
+        description: Name of the product to delete
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Products deleted successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: No products found with the given name
+          content:
+            '*/*':
+              schema:
+                type: object
+  /store/deleteCategoryByName/{name}:
+    delete:
+      tags:
+      - Store
+      summary: Delete category by name
+      description: Delete a category by its name
+      operationId: deleteCategoryByName
+      parameters:
+      - name: name
+        in: path
+        description: Name of the category to delete
+        required: true
+        schema:
+          type: string
+      responses:
+        "404":
+          description: Category not found
+          content:
+            '*/*':
+              schema:
+                type: object
+        "200":
+          description: Category deleted successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/admin/users/{id}:
+    delete:
+      tags:
+      - Admin
+      summary: Delete a user
+      description: Delete a user by their ID
+      operationId: deleteUser_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "204":
+          description: User deleted successfully
+        "404":
+          description: User not found
+  /api/admin/sellers/{id}:
+    delete:
+      tags:
+      - Admin
+      summary: Delete a seller
+      description: Delete a seller by their ID
+      operationId: deleteSeller_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "204":
+          description: Seller deleted successfully
+        "404":
+          description: Seller not found
+  /api/admin/clients/{id}:
+    delete:
+      tags:
+      - Admin
+      summary: Delete a client
+      description: Delete a client by their ID
+      operationId: deleteClient_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Client not found
+        "204":
+          description: Client deleted successfully
+components:
+  schemas:
+    Panier:
+      type: object
+      properties:
+        panier_id:
+          type: integer
+          format: int32
+        date:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: object
+        client:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          writeOnly: true
+        totalAmount:
+          type: number
+          format: double
+    PanierItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
+          format: int32
+        price:
+          type: number
+        product:
+          type: string
+        seller:
+          type: string
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        category:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: double
+        quantity:
+          type: integer
+          format: int32
+        images:
+          type: array
+          items:
+            type: string
+        panierItems:
+          type: array
+          items:
+            $ref: "#/components/schemas/PanierItem"
+      description: Product to remove from favorites
+    Seller:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        fullName:
+          type: string
+        email:
+          type: string
+        region:
+          type: string
+        password:
+          type: string
+        city:
+          type: string
+        phone:
+          type: string
+        role:
+          type: string
+        produitFavoris:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        paniers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Panier"
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        businessName:
+          type: string
+        address:
+          type: string
+      description: Seller registration data
+    Client:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        fullName:
+          type: string
+        email:
+          type: string
+        region:
+          type: string
+        password:
+          type: string
+        city:
+          type: string
+        phone:
+          type: string
+        role:
+          type: string
+        produitFavoris:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        paniers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Panier"
+        address:
+          type: string
+      description: Client registration data
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+    AuthRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      description: Authentication request
+    PageUser:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        pageNumber:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        pageSize:
+          type: integer
+          format: int32
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        fullName:
+          type: string
+        email:
+          type: string
+        region:
+          type: string
+        password:
+          type: string
+        city:
+          type: string
+        phone:
+          type: string
+        role:
+          type: string
+        address:
+          type: string
+    PageSeller:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/Seller"
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        empty:
+          type: boolean
+    PageClient:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/Client"
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        empty:
+          type: boolean

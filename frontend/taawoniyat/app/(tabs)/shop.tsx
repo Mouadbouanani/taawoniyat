@@ -114,6 +114,13 @@ export default function ShopScreen() {
       const data: ProductData[] = await response.json();
       console.log('JSON parsed successfully. Data received:', data.length, 'items'); // Log after parsing
 
+      // Log the structure of the first product to debug
+      if (data.length > 0) {
+        console.log('First product structure:', JSON.stringify(data[0], null, 2));
+        console.log('First product category:', data[0]?.category);
+        console.log('First product category type:', typeof data[0]?.category);
+      }
+
       setProducts(data);
       setFilteredProducts(data);
     } catch (error: any) {
@@ -136,24 +143,45 @@ export default function ShopScreen() {
       setFilteredProducts(products);
       return;
     }
-    const filtered = products.filter(product =>
-      // Search by name or description
-      product.name.toLowerCase().includes(query.toLowerCase()) ||
-      product.description.toLowerCase().includes(query.toLowerCase())
-    );
+    const filtered = products.filter(product => {
+      // Add safety checks for null/undefined values
+      const productName = product?.name ?? '';
+      const productDescription = product?.description ?? '';
+      const searchQuery = query.toLowerCase();
+
+      return productName.toLowerCase().includes(searchQuery) ||
+             productDescription.toLowerCase().includes(searchQuery);
+    });
     setFilteredProducts(filtered);
   };
 
   const handleCategorySelect = (category: string) => {
+    console.log('Category selected:', category);
+    console.log('Available products:', products.length);
+
     if (category === 'All') {
       setFilteredProducts(products);
       return;
     }
+
     const filtered = products.filter(product => {
-      // Use a default empty string if product or product.category is null/undefined
+      // Add comprehensive safety checks
+      if (!product) {
+        console.warn('Found null/undefined product in products array');
+        return false;
+      }
+
+      // Use a default empty string if product.category is null/undefined
       const productCategory = product?.category ?? '';
-      return productCategory.toLowerCase() === category.toLowerCase();
+      const categoryLower = category.toLowerCase();
+      const productCategoryLower = productCategory.toLowerCase();
+
+      console.log(`Comparing product category "${productCategory}" with selected "${category}"`);
+
+      return productCategoryLower === categoryLower;
     });
+
+    console.log(`Filtered ${filtered.length} products for category "${category}"`);
     setFilteredProducts(filtered);
   };
 

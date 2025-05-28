@@ -46,6 +46,8 @@ public class Product {
 
 
     public Product() {
+        this.images = new ArrayList<>();
+        this.panierItems = new ArrayList<>();
     }
 
     public long getId() {
@@ -97,9 +99,11 @@ public class Product {
     }
 
     public List<String> getImages() {
-        List<String> images = new ArrayList<>();
-        this.images.forEach(image -> images.add(image.getImageUrl()));
-        return images;
+        List<String> imageUrls = new ArrayList<>();
+        if (this.images != null) {
+            this.images.forEach(image -> imageUrls.add(image.getImageUrl()));
+        }
+        return imageUrls;
     }
 
     public void setImages(List<ProductImage> images) {

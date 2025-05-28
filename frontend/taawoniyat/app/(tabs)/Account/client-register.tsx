@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { authService } from '@/services/authService';
 
-export default function SellerRegisterScreen() {
+export default function ClientRegisterScreen() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,12 +24,11 @@ export default function SellerRegisterScreen() {
   const [region, setRegion] = useState('');
   const [city, setCity] = useState('');
   const [address, setAddress] = useState('');
-  const [businessName, setBusinessName] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleRegister = async () => {
-    if (!fullName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim() || !phone.trim() || !region.trim() || !city.trim() || !address.trim() || !businessName.trim()) {
+    if (!fullName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim() || !phone.trim() || !region.trim() || !city.trim() || !address.trim()) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
@@ -41,7 +40,7 @@ export default function SellerRegisterScreen() {
 
     setLoading(true);
     try {
-      const response = await authService.registerSeller({
+      const response = await authService.registerClient({
         fullName,
         email,
         password,
@@ -49,12 +48,11 @@ export default function SellerRegisterScreen() {
         region,
         city,
         address,
-        businessName,
       });
 
       if (response.success) {
         Alert.alert('Success', 'Registration successful! Please login.');
-        router.replace('/(auth)/login');
+        router.replace('/Account/login');
       } else {
         Alert.alert('Error', response.message || 'Registration failed');
       }
@@ -74,7 +72,7 @@ export default function SellerRegisterScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.contentContainer}>
           <View style={styles.header}>
-            <ThemedText type="title" style={styles.title}>Create Seller Account</ThemedText>
+            <ThemedText type="title" style={styles.title}>Create Client Account</ThemedText>
           </View>
 
           <View style={styles.inputContainer}>
@@ -85,16 +83,6 @@ export default function SellerRegisterScreen() {
                 placeholder="Full Name"
                 value={fullName}
                 onChangeText={setFullName}
-              />
-            </View>
-
-            <View style={styles.inputWrapper}>
-              <Ionicons name="business-outline" size={20} color="#666" style={styles.inputIcon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Business Name"
-                value={businessName}
-                onChangeText={setBusinessName}
               />
             </View>
 
@@ -189,7 +177,7 @@ export default function SellerRegisterScreen() {
 
           <View style={styles.loginContainer}>
             <ThemedText style={styles.loginText}>Already have an account? </ThemedText>
-            <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
+            <TouchableOpacity onPress={() => router.push('/Account/login')}>
               <ThemedText style={styles.loginLink}>Login</ThemedText>
             </TouchableOpacity>
           </View>

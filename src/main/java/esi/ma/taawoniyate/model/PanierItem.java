@@ -82,6 +82,11 @@ public class PanierItem {
         return seller != null ? seller.getBusinessName() : null;
     }
 
+    @JsonIgnore
+    public Seller getSellerEntity() {
+        return seller;
+    }
+
     public void setSeller(Seller seller) {
         this.seller = seller;
     }

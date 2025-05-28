@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 // Import platform to conditionally render file input
 import { Platform } from 'react-native';
-import { ThemedText } from '@/components/ThemedText'; // Assuming ThemedText exists
+import { ThemedText } from '@/(modals)/ThemedText'; // Assuming ThemedText exists
 import { Ionicons } from '@expo/vector-icons'; // Assuming Ionicons exists
 import { useRouter } from 'expo-router'; // Assuming expo-router is used for navigation
 import { authService, Product } from '@/services/authService'; // Import authService and Product interface

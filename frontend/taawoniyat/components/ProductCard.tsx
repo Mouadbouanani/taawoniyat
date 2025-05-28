@@ -3,6 +3,7 @@ import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { ThemedText } from './ThemedText';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 // Define a type for the product data structure
 export type ProductData = {
@@ -25,8 +26,7 @@ type ProductProps = ProductData & {
 };
 
 export function ProductCard({ id, name, description, price, images, onAddToCart, onToggleFavorite, isFavorite, category, quantity, sellerFullName }: ProductProps) {
-  // Remove internal isFavorite state
-  // const [isFavorite, setIsFavorite] = useState(false);
+  const router = useRouter();
 
   const imageUrl = images && images.length > 0 ? images[0] : '';
 
@@ -35,23 +35,30 @@ export function ProductCard({ id, name, description, price, images, onAddToCart,
     // isFavorite is not part of the data being passed back, it's managed in the parent
   };
 
+  const handleProductPress = () => {
+    router.push(`/(modal)/product/${id}`);
+  };
+
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={handleProductPress}>
       {imageUrl ? (
         <Image source={imageUrl} style={styles.image} contentFit="cover" />
       ) : (
         <View style={styles.placeholderImage}><ThemedText>No Image</ThemedText></View>
       )}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.favoriteButton}
         // Call onToggleFavorite and pass the product data
-        onPress={() => onToggleFavorite(productToAdd)}
+        onPress={(e) => {
+          e.stopPropagation();
+          onToggleFavorite(productToAdd);
+        }}
       >
-        <Ionicons 
+        <Ionicons
           // Use the isFavorite prop to determine the icon
-          name={isFavorite ? "heart" : "heart-outline"} 
-          size={24} 
-          color={isFavorite ? "#ff4646" : "#666"} 
+          name={isFavorite ? "heart" : "heart-outline"}
+          size={24}
+          color={isFavorite ? "#ff4646" : "#666"}
         />
       </TouchableOpacity>
       <View style={styles.content}>
@@ -63,14 +70,17 @@ export function ProductCard({ id, name, description, price, images, onAddToCart,
           </ThemedText>
           <TouchableOpacity
             style={styles.addToCartButton}
-            onPress={() => onAddToCart(productToAdd)}
+            onPress={(e) => {
+              e.stopPropagation();
+              onAddToCart(productToAdd);
+            }}
           >
             <Ionicons name="add" size={20} color="#fff" />
             <ThemedText style={styles.addToCartButtonText}>Add</ThemedText>
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

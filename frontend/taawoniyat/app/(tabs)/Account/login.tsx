@@ -31,7 +31,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await login(email, password);
-      router.replace('./account');
+      router.replace('/Account/account');
     } catch (error) {
       console.error('Login error:', error);
       Alert.alert('Error', 'Failed to connect to the server or network error.');
@@ -91,7 +91,7 @@ export default function LoginScreen() {
         <View style={styles.registerContainer}>
           <ThemedText variant="body1" style={styles.registerText}>Don't have an account? </ThemedText>
           <TouchableOpacity onPress={() => {
-            router.push('./register-select');
+            router.push('/Account/register-select');
           }}>
             <ThemedText variant="button" style={styles.registerLink}>Register</ThemedText>
           </TouchableOpacity>

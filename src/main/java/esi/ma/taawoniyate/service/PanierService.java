@@ -25,4 +25,11 @@ public class PanierService {
     public List<Panier> getAllPanierByClient(Client client) {
         return panierRepository.findAllByClient(client);
     }
+
+    public Panier findByClientId(Long clientId) {
+        // Create a temporary client object with just the ID to find the panier
+        Client tempClient = new Client();
+        tempClient.setId(clientId);
+        return panierRepository.findByClient(tempClient);
+    }
 }

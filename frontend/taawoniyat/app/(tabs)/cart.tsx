@@ -177,7 +177,7 @@
     const renderCheckoutForm = () => (
       <View style={styles.checkoutForm}>
         <ThemedText variant="h1" style={styles.checkoutTitle}>Checkout</ThemedText>
-        
+
         <View style={styles.formSection}>
           <ThemedText variant="h2" style={styles.sectionTitle}>Shipping Information</ThemedText>
           <TextInput
@@ -360,7 +360,7 @@
 
               <TouchableOpacity
                 style={styles.checkoutButton}
-                onPress={() => setShowCheckout(true)}
+                onPress={() => router.push('/(modal)/checkout')}
               >
                 <ThemedText style={styles.checkoutButtonText}>
                   Proceed to Checkout

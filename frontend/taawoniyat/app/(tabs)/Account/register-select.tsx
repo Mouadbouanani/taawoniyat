@@ -23,7 +23,7 @@ export default function RegisterSelectScreen() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.push('/(auth)/client-register')}
+          onPress={() => router.push('/Account/client-register')}
         >
           <Ionicons name="person-outline" size={30} color="#fff" />
           <ThemedText style={styles.buttonText}>Register as Client</ThemedText>
@@ -31,7 +31,7 @@ export default function RegisterSelectScreen() {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.push('/(auth)/seller-register')}
+          onPress={() => router.push('/Account/seller-register')}
         >
           <Ionicons name="business-outline" size={30} color="#fff" />
           <ThemedText style={styles.buttonText}>Register as Seller</ThemedText>
