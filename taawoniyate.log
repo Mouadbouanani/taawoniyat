@@ -210,3 +210,25 @@
 2025-05-26T03:22:58.782+01:00  INFO 2796 --- [taawoniyate] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
 2025-05-26T03:22:58.821+01:00  INFO 2796 --- [taawoniyate] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
 2025-05-26T03:22:58.832+01:00  INFO 2796 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : Started TaawoniyateApplication in 10.881 seconds (process running for 11.658)
+2025-05-27T03:45:56.605+01:00  INFO 7744 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : Starting TaawoniyateApplication using Java 23.0.1 with PID 7744 (D:\java project\taawoniyat_1\target\classes started by aymen in D:\java project\taawoniyat_1)
+2025-05-27T03:45:56.710+01:00  INFO 7744 --- [taawoniyate] [restartedMain] e.ma.taawoniyate.TaawoniyateApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-05-27T03:45:56.833+01:00  INFO 7744 --- [taawoniyate] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-05-27T03:45:56.834+01:00  INFO 7744 --- [taawoniyate] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-05-27T03:45:58.055+01:00  WARN 7744 --- [taawoniyate] [restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.support.BeanDefinitionOverrideException: Invalid bean definition with name 'corsConfigurer' defined in class path resource [esi/ma/taawoniyate/config/WebConfig.class]: Cannot register bean definition [Root bean: class=null; scope=; abstract=false; lazyInit=null; autowireMode=3; dependencyCheck=0; autowireCandidate=true; primary=false; fallback=false; factoryBeanName=webConfig; factoryMethodName=corsConfigurer; initMethodNames=null; destroyMethodNames=[(inferred)]; defined in class path resource [esi/ma/taawoniyate/config/WebConfig.class]] for bean 'corsConfigurer' since there is already [Root bean: class=null; scope=; abstract=false; lazyInit=null; autowireMode=3; dependencyCheck=0; autowireCandidate=true; primary=false; fallback=false; factoryBeanName=corsConfig; factoryMethodName=corsConfigurer; initMethodNames=null; destroyMethodNames=[(inferred)]; defined in class path resource [esi/ma/taawoniyate/config/CorsConfig.class]] bound.
+2025-05-27T03:45:58.065+01:00  INFO 7744 --- [taawoniyate] [restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-05-27T03:45:58.108+01:00 ERROR 7744 --- [taawoniyate] [restartedMain] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+The bean 'corsConfigurer', defined in class path resource [esi/ma/taawoniyate/config/WebConfig.class], could not be registered. A bean with that name has already been defined in class path resource [esi/ma/taawoniyate/config/CorsConfig.class] and overriding is disabled.
+
+Action:
+
+Consider renaming one of the beans or enabling overriding by setting spring.main.allow-bean-definition-overriding=true
+
