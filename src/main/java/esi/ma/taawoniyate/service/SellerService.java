@@ -11,25 +11,23 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class SellerService {
-
     @Autowired
     private SellerRepository sellerRepository;
-
     @Cacheable(value = "sellers", key = "#id")
     public Optional<Seller> findById(Integer id) {
         return sellerRepository.findById(id);
     }
-
     public Page<Seller> findAll(Pageable pageable) {
         return sellerRepository.findAll(pageable);
     }
-
     @Transactional
     @CacheEvict(value = {"sellers", "clients", "users"}, key = "#seller.id")
     public Seller save(Seller seller) {
@@ -38,7 +36,6 @@ public class SellerService {
         }
         return sellerRepository.save(seller);
     }
-
     @Transactional
     @CacheEvict(value = {"sellers", "clients", "users"}, key = "#seller.id")
     public Seller update(Seller seller) {
@@ -71,5 +68,11 @@ public class SellerService {
 
     public boolean existsById(Integer id) {
         return sellerRepository.existsById(id);
+    }
+    public List<Product> getProductsByBusinessName(String businessName) {
+        List<Seller> sellers = findByBusinessName(businessName);
+        List<Product> products = new ArrayList<>();
+        sellers.forEach(seller -> {products.addAll(seller.getProducts());});
+        return products;
     }
 }

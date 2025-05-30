@@ -1,9 +1,22 @@
 package esi.ma.taawoniyate.model;
 
-import jakarta.persistence.*;
-import lombok.Data;
-
+import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.Data;
 
 @Entity
 @Table(name = "product")
@@ -18,10 +31,10 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @Column(name = "name")
+    @Column(name = "name", length = 500)
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 2000)
     private String description;
 
     @Column(name = "price")
@@ -35,12 +48,17 @@ public class Product {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="seller_id", nullable= false)
+    @JsonIgnore
     private Seller seller;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<PanierItem> panierItems;
 
+
+
     public Product() {
+        this.images = new ArrayList<>();
+        this.panierItems = new ArrayList<>();
     }
 
     public long getId() {
@@ -51,8 +69,8 @@ public class Product {
         this.id = id;
     }
 
-    public Category getCategory() {
-        return category;
+    public String getCategory() {
+        return category.getName();
     }
 
     public void setCategory(Category category) {
@@ -91,16 +109,23 @@ public class Product {
         this.quantity = quantity;
     }
 
-    public List<ProductImage> getImages() {
-        return images;
+    public List<String> getImages() {
+        List<String> imageUrls = new ArrayList<>();
+        if (this.images != null) {
+            this.images.forEach(image -> imageUrls.add(image.getImageUrl()));
+        }
+        return imageUrls;
     }
 
     public void setImages(List<ProductImage> images) {
         this.images = images;
     }
 
-    public Seller getSeller() {
-        return seller;
+    public String getSeller() {
+        return seller.getBusinessName();
+    }
+    public String getSellerFullName() {
+        return seller.getFullName();
     }
 
     public void setSeller(Seller seller) {

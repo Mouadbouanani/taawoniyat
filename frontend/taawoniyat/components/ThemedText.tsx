@@ -1,31 +1,50 @@
 import { StyleSheet, Text, type TextProps } from 'react-native';
-
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { typography } from '@/theme/typography';
+import { colors } from '@/theme/colors';
 
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
+  variant?: keyof typeof typography.styles;
+  color?: 'primary' | 'neutral' | 'success' | 'error' | 'warning';
+  weight?: keyof typeof typography.weights;
+  align?: 'auto' | 'left' | 'right' | 'center' | 'justify';
 };
 
 export function ThemedText({
   style,
   lightColor,
   darkColor,
-  type = 'default',
+  variant = 'body1',
+  color = 'neutral',
+  weight,
+  align = 'left',
   ...rest
 }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const textColor = useThemeColor(
+    { light: lightColor, dark: darkColor },
+    'text'
+  );
+
+  const getColorValue = () => {
+    if (color === 'primary') return colors.primary[600];
+    if (color === 'neutral') return colors.neutral[900];
+    if (color === 'success') return colors.success[600];
+    if (color === 'error') return colors.error[600];
+    if (color === 'warning') return colors.warning[600];
+    return textColor;
+  };
 
   return (
     <Text
       style={[
-        { color },
-        type === 'default' ? styles.default : undefined,
-        type === 'title' ? styles.title : undefined,
-        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
-        type === 'subtitle' ? styles.subtitle : undefined,
-        type === 'link' ? styles.link : undefined,
+        typography.styles[variant],
+        {
+          color: getColorValue(),
+          textAlign: align,
+          ...(weight && { fontWeight: typography.weights[weight] }),
+        },
         style,
       ]}
       {...rest}
@@ -33,28 +52,15 @@ export function ThemedText({
   );
 }
 
+// Example usage styles
 const styles = StyleSheet.create({
-  default: {
-    fontSize: 16,
-    lineHeight: 24,
+  container: {
+    padding: 16,
   },
-  defaultSemiBold: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: '600',
+  heading: {
+    marginBottom: 8,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    lineHeight: 32,
-  },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  link: {
-    lineHeight: 30,
-    fontSize: 16,
-    color: '#0a7ea4',
+  paragraph: {
+    marginBottom: 16,
   },
 });

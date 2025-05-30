@@ -1,6 +1,5 @@
 package esi.ma.taawoniyate.model;
 
-
 //import jakarta.persistence.Entity;
 //import jakarta.persistence.GeneratedValue;
 //import jakarta.persistence.Id;
@@ -8,39 +7,44 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype")
 public abstract class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id ;
-    @Column
-    private String fullName ;
-    @Column
-    private String email ;
-    @Column
-    private String region ;
-    @Column
-    private String password ;
-    @Column
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+    @SequenceGenerator(name = "user_seq", sequenceName = "user_sequence", allocationSize = 1)
+    @Column(name = "id", nullable = false)
+    private long id;
+    @Column(nullable = false)
+    private String fullName;
+    @Column(unique = true, nullable = false)
+    private String email;
+    @Column(nullable = false)
+    private String region;
+    @Column(nullable = false)
+    private String password;
+    @Column(nullable = false)
     private String city;
-    @Column
+    @Column(name = "address", nullable = false)
     private String Address;
-    @Column(name = "phone")
+    @Column(name = "phone", nullable = false)
     private String phone;
-    @Column
+    @Column(nullable = false)
     private String role; // client, admin, seller
 
-    public User(long id, String fullName, String email, String region, String password, String city, String address, String phone, String role) {
-        this.id = id;
+    public User(String fullName, String email, String region, String password, String city, String address, String phone, String role) {
         this.fullName = fullName;
         this.email = email;
         this.region = region;
         this.password = password;
         this.city = city;
-        Address = address;
+        this.Address = address;
         this.phone = phone;
         this.role = role;
     }
 
+    public User() {
+    }
 
     public String getPhone() {
         return phone;
@@ -48,10 +52,6 @@ public abstract class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public User(){
-
     }
 
     public long getId() {
