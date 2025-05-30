@@ -13,6 +13,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { ProductData } from '@/components/ProductCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
@@ -63,10 +64,63 @@ export default function ProductDetailsScreen({ productId }: ProductDetailsScreen
     }
   };
 
-  const handleAddToCart = () => {
-    if (product) {
-      // Add to cart logic here
-      Alert.alert('Success', 'Product added to cart!');
+  const handleAddToCart = async () => {
+    if (!product) return;
+
+    try {
+      // Check if user is authenticated
+      const userJson = await AsyncStorage.getItem('user');
+      if (!userJson) {
+        Alert.alert(
+          'Login Required',
+          'Please log in to add items to your cart',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Login', onPress: () => router.push('/Account/login') }
+          ]
+        );
+        return;
+      }
+
+      const user = JSON.parse(userJson);
+      const cartKey = `cartItems_${user.id}`;
+
+      // Get current cart items from AsyncStorage (user-specific)
+      const existingCartJson = await AsyncStorage.getItem(cartKey);
+      let cartItems: (ProductData & { cartQuantity: number })[] = existingCartJson
+        ? JSON.parse(existingCartJson)
+        : [];
+
+      // Check if the product is already in the cart
+      const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
+
+      if (existingItemIndex > -1) {
+        // If item exists, increase quantity
+        cartItems[existingItemIndex].cartQuantity += 1;
+      } else {
+        // If item doesn't exist, add it to cart with quantity 1
+        const productWithQuantity = {
+          ...product,
+          cartQuantity: 1
+        };
+        cartItems.push(productWithQuantity);
+      }
+
+      // Save updated cart to AsyncStorage (user-specific)
+      await AsyncStorage.setItem(cartKey, JSON.stringify(cartItems));
+
+      // Calculate total number of items in cart
+      const totalItemsInCart = cartItems.reduce((total, item) => total + item.cartQuantity, 0);
+
+      // Show notification with total cart count
+      Alert.alert(
+        'Added to Cart!',
+        `You now have ${totalItemsInCart} item${totalItemsInCart === 1 ? '' : 's'} in your cart`,
+        [{ text: 'OK', style: 'default' }]
+      );
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      Alert.alert('Error', 'Failed to add product to cart');
     }
   };
 
@@ -91,7 +145,7 @@ export default function ProductDetailsScreen({ productId }: ProductDetailsScreen
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#8B4513" />
+        <ActivityIndicator size="large" color="#008080" />
       </View>
     );
   }
@@ -108,7 +162,7 @@ export default function ProductDetailsScreen({ productId }: ProductDetailsScreen
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#8B4513" />
+          <Ionicons name="arrow-back" size={24} color="#008080" />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>Product Details</ThemedText>
       </View>
@@ -177,7 +231,7 @@ export default function ProductDetailsScreen({ productId }: ProductDetailsScreen
 
           <View style={styles.priceContainer}>
             <ThemedText style={styles.price}>
-              ${product.price.toFixed(2)}
+              {product.price.toFixed(2)} DH
             </ThemedText>
             <View style={styles.stockContainer}>
               <Ionicons
@@ -213,7 +267,7 @@ export default function ProductDetailsScreen({ productId }: ProductDetailsScreen
 
             <View style={styles.sellerCard}>
               <View style={styles.sellerHeader}>
-                <Ionicons name="person-circle-outline" size={40} color="#8B4513" />
+                <Ionicons name="person-circle-outline" size={40} color="#008080" />
                 <View style={styles.sellerDetails}>
                   <ThemedText style={styles.sellerName}>
                     {product.seller.fullName}
@@ -262,7 +316,7 @@ export default function ProductDetailsScreen({ productId }: ProductDetailsScreen
             onPress={handleAddToCart}
             disabled={product.quantity === 0}
           >
-            <Ionicons name="cart-outline" size={24} color="#fff" />
+            <Ionicons name="cart-outline" size={18} color="#fff" />
             <ThemedText style={styles.addToCartText}>
               {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
             </ThemedText>
@@ -276,7 +330,7 @@ export default function ProductDetailsScreen({ productId }: ProductDetailsScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F8FAFC',
   },
   header: {
     flexDirection: 'row',
@@ -293,7 +347,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#008080',
   },
   content: {
     flex: 1,
@@ -329,7 +383,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   activeIndicator: {
-    backgroundColor: '#8B4513',
+    backgroundColor: '#008080',
   },
   thumbnailContainer: {
     paddingHorizontal: 16,
@@ -344,7 +398,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   activeThumbnail: {
-    borderColor: '#8B4513',
+    borderColor: '#008080',
   },
   noImageContainer: {
     height: 300,
@@ -374,9 +428,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   price: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#8B4513',
+    color: '#008080',
   },
   stockContainer: {
     flexDirection: 'row',
@@ -456,7 +510,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#8B4513',
+    backgroundColor: '#008080',
     paddingVertical: 12,
     borderRadius: 8,
   },
@@ -475,17 +529,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#4CAF50',
-    paddingVertical: 16,
-    borderRadius: 12,
+    backgroundColor: '#F97316',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
   },
   disabledButton: {
     backgroundColor: '#ccc',
   },
   addToCartText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    marginLeft: 8,
+    marginLeft: 6,
   },
 });

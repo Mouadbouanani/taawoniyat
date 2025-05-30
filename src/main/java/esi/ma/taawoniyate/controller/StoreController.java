@@ -1,5 +1,11 @@
 package esi.ma.taawoniyate.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +40,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @CrossOrigin(origins = "http://localhost:8081",allowCredentials = "true")
 @RestController
 @RequestMapping("/store")
+@Tag(name = "Store (Public)", description = "Public APIs for browsing products, categories, and store information")
 public class StoreController {
 
     @Autowired
@@ -56,7 +63,14 @@ public class StoreController {
     @Autowired
     private CloudinaryService cloudinaryService;
 
-    // Get all products
+    @Operation(
+        summary = "Get all products",
+        description = "Retrieve all products available in the store. This is a public endpoint that doesn't require authentication."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Products retrieved successfully"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/products")
     public List<Product> getAllProducts() {
         return productRepository.findAll();

@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
-import { ThemedText } from './ThemedText';
+import { Typography } from './ui/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useCart } from '@/contexts/CartContext';
+import { designSystem } from '@/theme/designSystem';
 
 // Define a type for the product data structure
 export type ProductData = {
@@ -27,8 +29,10 @@ type ProductProps = ProductData & {
 
 export function ProductCard({ id, name, description, price, images, onAddToCart, onToggleFavorite, isFavorite, category, quantity, sellerFullName }: ProductProps) {
   const router = useRouter();
+  const { addToCart, getProductQuantityInCart } = useCart();
 
   const imageUrl = images && images.length > 0 ? images[0] : '';
+  const cartQuantity = getProductQuantityInCart(id);
 
   const productToAdd = {
     id, name, description, price, images, category, quantity, sellerFullName,
@@ -39,44 +43,88 @@ export function ProductCard({ id, name, description, price, images, onAddToCart,
     router.push(`/(modal)/product/${id}`);
   };
 
+  const handleAddToCart = async () => {
+    try {
+      await addToCart(productToAdd);
+      // Also call the parent's onAddToCart for any additional logic
+      onAddToCart(productToAdd);
+    } catch (error: any) {
+      console.error('Error adding to cart:', error);
+      // Show error alert if adding to cart fails
+      if (error.message) {
+        alert(error.message);
+      }
+    }
+  };
+
+  // Limit description to 100 characters
+  const truncateDescription = (text: string, maxLength: number = 100) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+
   return (
     <TouchableOpacity style={styles.card} onPress={handleProductPress}>
-      {imageUrl ? (
-        <Image source={imageUrl} style={styles.image} contentFit="cover" />
-      ) : (
-        <View style={styles.placeholderImage}><ThemedText>No Image</ThemedText></View>
-      )}
-      <TouchableOpacity
-        style={styles.favoriteButton}
-        // Call onToggleFavorite and pass the product data
-        onPress={(e) => {
-          e.stopPropagation();
-          onToggleFavorite(productToAdd);
-        }}
-      >
-        <Ionicons
-          // Use the isFavorite prop to determine the icon
-          name={isFavorite ? "heart" : "heart-outline"}
-          size={24}
-          color={isFavorite ? "#ff4646" : "#666"}
-        />
-      </TouchableOpacity>
+      <View style={styles.imageContainer}>
+        {imageUrl ? (
+          <Image source={imageUrl} style={styles.image} contentFit="cover" />
+        ) : (
+          <View style={styles.placeholderImage}>
+            <Ionicons name="image-outline" size={40} color={designSystem.colors.neutral[400]} />
+            <Typography variant="caption" color={designSystem.colors.neutral[500]}>No Image</Typography>
+          </View>
+        )}
+        <TouchableOpacity
+          style={styles.favoriteButton}
+          onPress={(e) => {
+            e.stopPropagation();
+            onToggleFavorite(productToAdd);
+          }}
+        >
+          <Ionicons
+            name={isFavorite ? "heart" : "heart-outline"}
+            size={20}
+            color={isFavorite ? designSystem.colors.error[500] : designSystem.colors.neutral[500]}
+          />
+        </TouchableOpacity>
+        {quantity <= 5 && quantity > 0 && (
+          <View style={styles.stockBadge}>
+            <Typography variant="caption" color="#FFFFFF">
+              {quantity} left
+            </Typography>
+          </View>
+        )}
+      </View>
+
       <View style={styles.content}>
-        <ThemedText type="subtitle" style={styles.title}>{name}</ThemedText>
-        <ThemedText style={styles.description}>{description}</ThemedText>
+        <Typography variant="body1" style={styles.title} numberOfLines={2}>
+          {name}
+        </Typography>
+        <Typography variant="body2" style={styles.description} numberOfLines={2}>
+          {truncateDescription(description, 80)}
+        </Typography>
+        {description.length > 80 && (
+          <Typography variant="caption" style={styles.readMore}>
+            Tap to read more...
+          </Typography>
+        )}
         <View style={styles.footer}>
-          <ThemedText type="defaultSemiBold" style={styles.price}>
-            ${price.toFixed(2)}
-          </ThemedText>
+          <Typography variant="body1" style={styles.price}>
+            {price.toFixed(2)} DH
+          </Typography>
           <TouchableOpacity
-            style={styles.addToCartButton}
+            style={[styles.addToCartButton, cartQuantity > 0 && styles.addToCartButtonWithQuantity]}
             onPress={(e) => {
               e.stopPropagation();
-              onAddToCart(productToAdd);
+              handleAddToCart();
             }}
           >
-            <Ionicons name="add" size={20} color="#fff" />
-            <ThemedText style={styles.addToCartButtonText}>Add</ThemedText>
+            <Ionicons name="add" size={16} color="#fff" />
+            {cartQuantity > 0 && (
+              <View style={styles.quantityBadge}>
+                <Typography variant="caption" style={styles.quantityBadgeText}>{cartQuantity}</Typography>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -87,72 +135,113 @@ export function ProductCard({ id, name, description, price, images, onAddToCart,
 const styles = StyleSheet.create({
   card: {
     width: '100%',
-    borderRadius: 12,
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    marginBottom: 16,
+    borderRadius: designSystem.borderRadius.lg,
+    backgroundColor: '#FFFFFF',
+    ...designSystem.shadows.md,
+    marginBottom: designSystem.spacing.md,
+    overflow: 'hidden',
+  },
+  imageContainer: {
+    position: 'relative',
+    width: '100%',
+    height: 180,
   },
   image: {
     width: '100%',
-    height: 200,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    height: '100%',
+    borderTopLeftRadius: designSystem.borderRadius.lg,
+    borderTopRightRadius: designSystem.borderRadius.lg,
+  },
+  placeholderImage: {
+    width: '100%',
+    height: '100%',
+    borderTopLeftRadius: designSystem.borderRadius.lg,
+    borderTopRightRadius: designSystem.borderRadius.lg,
+    backgroundColor: designSystem.colors.neutral[100],
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: designSystem.spacing.xs,
   },
   content: {
-    padding: 16,
+    padding: designSystem.spacing.md,
   },
   title: {
-    fontSize: 18,
-    marginBottom: 8,
+    marginBottom: designSystem.spacing.sm,
+    color: designSystem.colors.neutral[900],
+    fontWeight: designSystem.typography.weights.semibold,
+    lineHeight: 22,
+    minHeight: 44, // Ensure consistent height for 2 lines
   },
   description: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
+    color: designSystem.colors.neutral[600],
+    marginBottom: designSystem.spacing.xs,
+    lineHeight: 18,
+    minHeight: 36, // Ensure consistent height for 2 lines
+  },
+  readMore: {
+    color: designSystem.colors.primary[600],
+    fontStyle: 'italic',
+    marginBottom: designSystem.spacing.sm,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: designSystem.spacing.sm,
   },
   price: {
-    fontSize: 18,
-    color: '#2E7D32',
+    color: designSystem.colors.primary[600],
+    fontWeight: designSystem.typography.weights.bold,
   },
   favoriteButton: {
     position: 'absolute',
-    right: 12,
-    top: 12,
+    right: designSystem.spacing.sm,
+    top: designSystem.spacing.sm,
     zIndex: 1,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: designSystem.borderRadius.full,
+    padding: designSystem.spacing.xs,
+    ...designSystem.shadows.sm,
+  },
+  stockBadge: {
+    position: 'absolute',
+    left: designSystem.spacing.sm,
+    top: designSystem.spacing.sm,
+    backgroundColor: designSystem.colors.warning[500],
+    borderRadius: designSystem.borderRadius.md,
+    paddingHorizontal: designSystem.spacing.xs,
+    paddingVertical: 2,
   },
   addToCartButton: {
-    backgroundColor: '#0a7ea4',
-    flexDirection: 'row',
+    backgroundColor: designSystem.colors.primary[500],
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
-    borderRadius: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    gap: 4,
-  },
-  addToCartButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  placeholderImage: {
-    width: '100%',
-    height: 200,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    backgroundColor: '#e0e0e0',
     justifyContent: 'center',
+    position: 'relative',
+    ...designSystem.shadows.sm,
+  },
+  addToCartButtonWithQuantity: {
+    backgroundColor: designSystem.colors.secondary[500],
+  },
+
+  quantityBadge: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    backgroundColor: designSystem.colors.error[500],
+    borderRadius: designSystem.borderRadius.full,
+    minWidth: 18,
+    height: 18,
     alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+    ...designSystem.shadows.sm,
+  },
+  quantityBadgeText: {
+    color: '#fff',
+    fontWeight: designSystem.typography.weights.bold,
   },
 });

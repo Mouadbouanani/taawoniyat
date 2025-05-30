@@ -27,6 +27,14 @@ export default function ModalLayout() {
           headerShown: false 
         }} 
       />
+      <Stack.Screen 
+        name="seller-product-details/[id]" 
+        options={{ 
+          title: 'Seller Product Details',
+          presentation: 'modal',
+          headerShown: false 
+        }} 
+      />
     </Stack>
   );
 }

@@ -6,6 +6,7 @@
 target/
 build/
 HELP.md
+.cursor/
 
 # Exceptions : ne pas ignorer certains jars ou builds utiles
 !.mvn/wrapper/maven-wrapper.jar

@@ -61,6 +61,10 @@ export const authService = (() => {
   // Helper function to get auth headers
   const getAuthHeaders = async () => {
     const token = await AsyncStorage.getItem(TOKEN_KEY);
+    console.log('JWT Token available:', !!token);
+    if (token) {
+      console.log('Token preview:', token.substring(0, 20) + '...');
+    }
     return {
       'Content-Type': 'application/json',
       ...(token && { 'Authorization': `Bearer ${token}` })
@@ -101,6 +105,10 @@ export const authService = (() => {
 
     logout: async (): Promise<void> => {
       try {
+        // Get current user before clearing data
+        const userJson = await AsyncStorage.getItem(USER_KEY);
+        const currentUser = userJson ? JSON.parse(userJson) : null;
+
         const response = await fetch(`${API_BASE_URL}/logout`, {
           method: 'POST',
         });
@@ -109,10 +117,18 @@ export const authService = (() => {
           console.error('Backend logout failed:', response.status, await response.text());
         }
 
+        // Clear user authentication data
         await AsyncStorage.removeItem(USER_KEY);
         await AsyncStorage.removeItem(TOKEN_KEY);
 
-        console.log('User logged out.');
+        // Clear user-specific cart and favorites data
+        if (currentUser) {
+          await AsyncStorage.removeItem(`cartItems_${currentUser.id}`);
+          await AsyncStorage.removeItem(`favoriteProducts_${currentUser.id}`);
+          console.log(`Cleared user-specific data for user ${currentUser.id}`);
+        }
+
+        console.log('User logged out and data cleared.');
 
       } catch (error) {
         console.error('Logout error:', error);
@@ -353,33 +369,60 @@ export const authService = (() => {
       return true; // Simulate success
     },
 
-    deleteSellerProduct: async (productId: number): Promise<boolean> => {
+    deleteSellerProduct: async (productId: number, productName?: string): Promise<boolean> => {
       try {
-        console.log(`Deleting product with ID: ${productId}`);
+        console.log(`=== STARTING DELETE PROCESS ===`);
+        console.log(`Product ID: ${productId}`);
+        console.log(`Product Name: ${productName}`);
 
         const headers = await getAuthHeaders();
-        if (!headers.Authorization) {
-          console.error('No authentication token available');
-          return false;
+        console.log('Headers prepared:', !!headers.Authorization);
+
+        // Always try JWT first if token is available
+        if (headers.Authorization) {
+          console.log('Attempting JWT-authenticated delete...');
+          const response = await fetch(`http://localhost:8080/api/products/${productId}`, {
+            method: 'DELETE',
+            headers: headers,
+          });
+
+          console.log('JWT delete response status:', response.status);
+
+          if (response.ok) {
+            console.log('✅ Product deleted successfully via JWT');
+            return true;
+          } else {
+            const errorText = await response.text();
+            console.error('❌ JWT delete failed:', response.status, errorText);
+          }
         }
 
-        const response = await fetch(`http://localhost:8080/api/products/${productId}`, {
-          method: 'DELETE',
-          headers: headers,
-        });
+        // Fallback to session-based delete using product name
+        if (productName) {
+          console.log('Trying session-based delete with product name...');
+          const sessionResponse = await fetch(`http://localhost:8080/store/deleteProductByName/${encodeURIComponent(productName)}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
 
-        console.log('Delete product response status:', response.status);
+          console.log('Session delete response status:', sessionResponse.status);
 
-        if (response.ok) {
-          console.log('Product deleted successfully');
-          return true;
+          if (sessionResponse.ok) {
+            console.log('✅ Product deleted successfully via session');
+            return true;
+          } else {
+            const errorText = await sessionResponse.text();
+            console.error('❌ Session delete failed:', errorText);
+          }
         } else {
-          const errorText = await response.text();
-          console.error('Failed to delete product:', errorText);
-          return false;
+          console.log('❌ No product name provided for session-based delete');
         }
+
+        return false;
       } catch (error) {
-        console.error('Error deleting product:', error);
+        console.error('❌ Delete process error:', error);
         return false;
       }
     },
@@ -669,7 +712,7 @@ export const authService = (() => {
         // Transform cart items to panier format
         const panierItems = cartItems.map(item => ({
           productId: item.id,
-          quantity: item.quantity || 1,
+          quantity: item.cartQuantity || item.quantity || 1,
           price: item.price
         }));
 

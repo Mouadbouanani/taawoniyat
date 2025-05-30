@@ -1,5 +1,4 @@
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 
 export default function AuthLayout() {
   return (
@@ -35,13 +34,9 @@ export default function AuthLayout() {
       <Stack.Screen
         name="account"
         options={{
-          title: 'My Account',
-          headerShown: true,
-          headerLeft: () => (
-            <Ionicons name="person-circle-outline" size={24} color="#0a7ea4" />
-          ),
+          headerShown: false,
         }}
       />
     </Stack>
   );
-} 
+}

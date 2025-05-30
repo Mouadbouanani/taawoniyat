@@ -4,16 +4,18 @@ import {
   StyleSheet,
   View,
   ActivityIndicator,
-  Text,
   RefreshControl,
   Alert,
   TouchableOpacity,
 } from 'react-native';
 import { ProductCard, ProductData } from '@/components/ProductCard';
 import { SearchAndCategories } from '@/components/SearchAndCategories';
-// import { Product, mockProducts } from '@/data/mockProducts'; // Remove mock data import
+import { Header } from '@/components/ui/Header';
+import { Typography } from '@/components/ui/Typography';
+import { designSystem } from '@/theme/designSystem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useUser } from '@/contexts/UserContext';
 
 // Define Product interface based on backend structure (if needed, review authService.ts)
 // Moved Product interface definition to ProductCard.tsx and renamed to ProductData
@@ -39,12 +41,24 @@ export default function ShopScreen() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [favoriteProducts, setFavoriteProducts] = useState<ProductData[]>([]);
+  const { user, isAuthenticated } = useUser();
+
+  // Get user-specific favorites storage key
+  const getFavoritesKey = () => {
+    return user?.id ? `favoriteProducts_${user.id}` : 'favoriteProducts_guest';
+  };
 
   // Function to load favorite products from AsyncStorage
   const loadFavoriteProducts = async () => {
     try {
+      if (!isAuthenticated) {
+        setFavoriteProducts([]);
+        return;
+      }
+
       console.log('Loading favorite products from AsyncStorage...');
-      const existingFavoritesJson = await AsyncStorage.getItem('favoriteProducts');
+      const favoritesKey = getFavoritesKey();
+      const existingFavoritesJson = await AsyncStorage.getItem(favoritesKey);
       const favorites: ProductData[] = existingFavoritesJson ? JSON.parse(existingFavoritesJson) : [];
       console.log('Loaded favorite products:', favorites);
       setFavoriteProducts(favorites);
@@ -56,8 +70,14 @@ export default function ShopScreen() {
   // Function to save favorite products to AsyncStorage
   const saveFavoriteProducts = async (favorites: ProductData[]) => {
     try {
+      if (!isAuthenticated || !user) {
+        console.log('Cannot save favorites: user not authenticated');
+        return;
+      }
+
       console.log('Saving favorite products to AsyncStorage:', favorites);
-      await AsyncStorage.setItem('favoriteProducts', JSON.stringify(favorites));
+      const favoritesKey = getFavoritesKey();
+      await AsyncStorage.setItem(favoritesKey, JSON.stringify(favorites));
     } catch (error) {
       console.error('Error saving favorite products to AsyncStorage:', error);
     }
@@ -65,6 +85,11 @@ export default function ShopScreen() {
 
   // Function to toggle favorite status
   const handleToggleFavorite = async (productToToggle: ProductData) => {
+    if (!isAuthenticated) {
+      Alert.alert('Login Required', 'Please log in to add products to your favorites.');
+      return;
+    }
+
     let updatedFavorites: ProductData[];
     const isCurrentlyFavorite = favoriteProducts.some(fav => fav.id === productToToggle.id);
 
@@ -91,8 +116,12 @@ export default function ShopScreen() {
 
   useEffect(() => {
     fetchProducts();
-    loadFavoriteProducts();
   }, []);
+
+  // Load favorites when user changes
+  useEffect(() => {
+    loadFavoriteProducts();
+  }, [user, isAuthenticated]);
 
   const fetchProducts = async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -185,34 +214,15 @@ export default function ShopScreen() {
     setFilteredProducts(filtered);
   };
 
-  // Function to handle adding products to the cart (using AsyncStorage)
+  // Function to handle adding products to the cart (simplified - context handles the logic)
   const handleAddToCart = async (productToAdd: ProductData) => {
     try {
-      // Get current cart items from AsyncStorage
-      const existingCartJson = await AsyncStorage.getItem('cartItems');
-      let cartItems: (ProductData & { cartQuantity: number })[] = existingCartJson
-        ? JSON.parse(existingCartJson)
-        : [];
-
-      // Check if the product is already in the cart
-      const existingItemIndex = cartItems.findIndex(item => item.id === productToAdd.id);
-
-      if (existingItemIndex > -1) {
-        // If item exists, increase quantity
-        cartItems[existingItemIndex].cartQuantity += 1;
-      } else {
-        // If item doesn't exist, add it with quantity 1
-        cartItems.push({ ...productToAdd, cartQuantity: 1 });
-      }
-
-      // Save updated cart items back to AsyncStorage
-      await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
-
+      // The ProductCard now handles this via CartContext
+      // This is just for any additional logic if needed
+      console.log('Product added to cart:', productToAdd.name);
       Alert.alert('Success', `${productToAdd.name} added to cart!`);
-      console.log(`Product ${productToAdd.name} added to cart. Current cart:`, cartItems);
-
     } catch (error: any) {
-      console.error('Error adding product to cart to AsyncStorage:', error);
+      console.error('Error adding to cart:', error);
       Alert.alert('Error', 'Failed to add product to cart.');
     }
   };
@@ -228,25 +238,42 @@ export default function ShopScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0a7ea4" />
+      <View style={styles.container}>
+        <Header title="Shop" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={designSystem.colors.primary[500]} />
+          <Typography variant="body2" color={designSystem.colors.neutral[600]} style={{ marginTop: 16 }}>
+            Loading products...
+          </Typography>
+        </View>
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Error: {error}</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={() => fetchProducts()}>
-          <Text style={styles.retryButtonText}>Retry</Text>
-        </TouchableOpacity>
+      <View style={styles.container}>
+        <Header title="Shop" />
+        <View style={styles.errorContainer}>
+          <Typography variant="h4" color={designSystem.colors.error[500]} align="center">
+            Oops! Something went wrong
+          </Typography>
+          <Typography variant="body2" color={designSystem.colors.neutral[600]} align="center" style={{ marginTop: 8, marginBottom: 24 }}>
+            {error}
+          </Typography>
+          <TouchableOpacity style={styles.retryButton} onPress={() => fetchProducts()}>
+            <Typography variant="button" color="#FFFFFF">
+              Try Again
+            </Typography>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
+      <Header title="Shop" />
       <SearchAndCategories
         onSearch={handleSearch}
         onCategorySelect={handleCategorySelect}
@@ -255,24 +282,33 @@ export default function ShopScreen() {
         style={styles.productsContainer}
         contentContainerStyle={styles.grid}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[designSystem.colors.primary[500]]}
+            tintColor={designSystem.colors.primary[500]}
+          />
         }
       >
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
             <View key={product.id} style={styles.productWrapper}>
-              {/* Pass the handleAddToCart and onToggleFavorite functions and isFavorite status */}
               <ProductCard
                 {...product}
                 onAddToCart={handleAddToCart}
                 onToggleFavorite={handleToggleFavorite}
-                isFavorite={product.isFavorite || false} // Pass isFavorite status
+                isFavorite={product.isFavorite || false}
               />
             </View>
           ))
         ) : (
           <View style={styles.noProductsContainer}>
-            <Text style={styles.noProductsText}>No products found</Text>
+            <Typography variant="h4" color={designSystem.colors.neutral[400]} align="center">
+              No products found
+            </Typography>
+            <Typography variant="body2" color={designSystem.colors.neutral[500]} align="center" style={{ marginTop: 8 }}>
+              Try adjusting your search or filters
+            </Typography>
           </View>
         )}
       </ScrollView>
@@ -283,54 +319,45 @@ export default function ShopScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: designSystem.colors.neutral[50],
   },
   productsContainer: {
     flex: 1,
   },
   grid: {
-    padding: 16,
+    padding: designSystem.spacing.md,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
   productWrapper: {
     width: '48%',
-    marginBottom: 16,
+    marginBottom: designSystem.spacing.md,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: designSystem.spacing.xl,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  errorText: {
-    color: '#666',
+    padding: designSystem.spacing.xl,
   },
   retryButton: {
-    marginTop: 12,
-    backgroundColor: '#0a7ea4',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 4,
-  },
-  retryButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    backgroundColor: designSystem.colors.primary[500],
+    paddingHorizontal: designSystem.spacing.lg,
+    paddingVertical: designSystem.spacing.sm + 4,
+    borderRadius: designSystem.borderRadius.md,
+    ...designSystem.shadows.sm,
   },
   noProductsContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 50, // Adjust as needed
+    padding: designSystem.spacing.xl,
     width: '100%',
-  },
-  noProductsText: {
-    fontSize: 18,
-    color: '#666',
   },
 });

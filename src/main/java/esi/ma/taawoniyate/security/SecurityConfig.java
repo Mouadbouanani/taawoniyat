@@ -43,11 +43,16 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // Public endpoints
                 .requestMatchers("/api/users/authenticate", "/api/users/register/**").permitAll()
-                .requestMatchers("/store/products", "/store/categories", "/store/addProductSimple").permitAll()
+                .requestMatchers("/store/products", "/store/categories", "/store/addProductSimple", "/store/addCategory").permitAll()
                 .requestMatchers("/panier/history").permitAll()
                 .requestMatchers("/store/deleteProductByName/**").permitAll()
-                // Protected endpoints
-                .requestMatchers("/api/users/me", "/api/users/seller/**", "/api/users/client/**").authenticated()
+                // Swagger/OpenAPI endpoints
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                .requestMatchers("/swagger-resources/**", "/webjars/**").permitAll()
+                // JWT-protected endpoints
+                .requestMatchers("/api/products/**").authenticated()
+                .requestMatchers("/api/users/me", "/api/users/seller/**", "/api/users/client/**", "/api/users/update-info").authenticated()
+                .requestMatchers("/api/panier/**").authenticated()
                 .requestMatchers("/store/addProduct").hasRole("SELLER")
                 // Allow all other requests for now (you can restrict later)
                 .anyRequest().permitAll()
@@ -65,7 +70,7 @@ public class SecurityConfig {
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

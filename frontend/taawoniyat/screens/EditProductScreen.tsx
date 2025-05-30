@@ -37,21 +37,24 @@ export default function EditProductScreen({ productId }: EditProductScreenProps)
   });
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<any[]>([]);
-
-  const categories = [
-    'Organic Acacia Honey',
-    'Organic Eucalyptus Honey',
-    'Organic Wildflower Honey',
-    'Raw Honey',
-    'Manuka Honey',
-    'Clover Honey',
-    'Orange Blossom Honey',
-    'Lavender Honey'
-  ];
+  const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
     fetchProductDetails();
+    fetchCategories();
   }, [productId]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/store/categories');
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const fetchProductDetails = async () => {
     try {
@@ -186,7 +189,7 @@ export default function EditProductScreen({ productId }: EditProductScreenProps)
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#8B4513" />
+        <ActivityIndicator size="large" color="#008080" />
       </View>
     );
   }
@@ -195,7 +198,7 @@ export default function EditProductScreen({ productId }: EditProductScreenProps)
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#8B4513" />
+          <Ionicons name="arrow-back" size={24} color="#008080" />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>Edit Product</ThemedText>
       </View>
@@ -308,7 +311,7 @@ export default function EditProductScreen({ productId }: EditProductScreenProps)
             </View>
           ) : (
             <TouchableOpacity style={styles.imagePickerButton} onPress={pickImages}>
-              <Ionicons name="camera-outline" size={48} color="#8B4513" />
+              <Ionicons name="camera-outline" size={48} color="#008080" />
               <ThemedText style={styles.imagePickerText}>Add Product Images</ThemedText>
               <ThemedText style={styles.imagePickerSubtext}>Up to 5 images</ThemedText>
             </TouchableOpacity>
@@ -371,7 +374,7 @@ export default function EditProductScreen({ productId }: EditProductScreenProps)
                 {/* Add More Images Button */}
                 {(selectedImages.length + newImages.length) < 5 && (
                   <TouchableOpacity style={styles.addMoreButton} onPress={pickImages}>
-                    <Ionicons name="add" size={24} color="#8B4513" />
+                    <Ionicons name="add" size={24} color="#008080" />
                   </TouchableOpacity>
                 )}
               </ScrollView>
@@ -408,7 +411,7 @@ export default function EditProductScreen({ productId }: EditProductScreenProps)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F8FAFC',
   },
   header: {
     flexDirection: 'row',
@@ -425,7 +428,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#008080',
   },
   content: {
     flex: 1,
@@ -444,17 +447,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#008080',
     marginBottom: 8,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     fontSize: 16,
     backgroundColor: '#fff',
   },
@@ -482,8 +485,8 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   selectedCategoryChip: {
-    backgroundColor: '#8B4513',
-    borderColor: '#8B4513',
+    backgroundColor: '#008080',
+    borderColor: '#008080',
   },
   categoryText: {
     fontSize: 12,
@@ -499,18 +502,18 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#008080',
     marginBottom: 12,
   },
   imagePickerButton: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFF8DC',
+    backgroundColor: '#F0FDFA',
     borderWidth: 2,
-    borderColor: '#8B4513',
+    borderColor: '#008080',
     borderStyle: 'dashed',
     borderRadius: 12,
     padding: 40,
@@ -520,13 +523,13 @@ const styles = StyleSheet.create({
   imagePickerText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#8B4513',
+    color: '#008080',
     fontWeight: '600',
   },
   imagePickerSubtext: {
     marginTop: 4,
     fontSize: 14,
-    color: '#8B4513',
+    color: '#008080',
     opacity: 0.7,
   },
   mainImageContainer: {
@@ -566,7 +569,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   activeThumbnail: {
-    borderColor: '#8B4513',
+    borderColor: '#008080',
   },
   removeThumbnailButton: {
     position: 'absolute',
@@ -581,11 +584,11 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#8B4513',
+    borderColor: '#008080',
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFF8DC',
+    backgroundColor: '#F0FDFA',
   },
   imageCountText: {
     fontSize: 12,
@@ -597,7 +600,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 2,
     left: 2,
-    backgroundColor: 'rgba(139, 69, 19, 0.8)',
+    backgroundColor: 'rgba(0, 128, 128, 0.8)',
     paddingHorizontal: 4,
     paddingVertical: 1,
     borderRadius: 4,
@@ -636,7 +639,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#8B4513',
+    backgroundColor: '#008080',
     paddingVertical: 16,
     borderRadius: 12,
   },

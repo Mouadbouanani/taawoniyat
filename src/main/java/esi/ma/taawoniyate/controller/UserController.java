@@ -7,6 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +48,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "http://localhost:8081",allowCredentials = "true")
+@Tag(name = "User Management", description = "APIs for user authentication, registration, and profile management")
 public class UserController {
 
     @Autowired
@@ -204,6 +213,15 @@ public class UserController {
         }
     }
 
+    @Operation(
+        summary = "Authenticate user",
+        description = "Authenticate user with email and password, returns JWT token"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Authentication successful"),
+        @ApiResponse(responseCode = "401", description = "Invalid credentials"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/authenticate")
     public ResponseEntity<Map<String, Object>> authenticateUser(@RequestBody AuthRequest authRequest) {
         Map<String, Object> response = new HashMap<>();
@@ -265,6 +283,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+    @Operation(
+        summary = "Get current user",
+        description = "Get current authenticated user information",
+        security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "User information retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "User not authenticated"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/me")
     public ResponseEntity<User> getCurrentUser(HttpServletRequest request) {
         try {
@@ -333,8 +361,20 @@ public class UserController {
         }
     }
 
+    @Operation(
+        summary = "Register new client",
+        description = "Register a new client user with personal information. All fields are required except address details which will default to 'Not specified' if not provided."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Client registered successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data or missing required fields"),
+        @ApiResponse(responseCode = "409", description = "Email already exists"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/register/client")
-    public ResponseEntity<Map<String, Object>> registerClient(@RequestBody Client client) {
+    public ResponseEntity<Map<String, Object>> registerClient(
+        @Parameter(description = "Client registration data", required = true)
+        @RequestBody Client client) {
         Map<String, Object> response = new HashMap<>();
 
         try {
@@ -384,8 +424,20 @@ public class UserController {
         }
     }
 
+    @Operation(
+        summary = "Register new seller",
+        description = "Register a new seller user with business information. Business name is required in addition to personal details."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Seller registered successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data or missing required fields"),
+        @ApiResponse(responseCode = "409", description = "Email already exists"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/register/seller")
-    public ResponseEntity<Map<String, Object>> registerSeller(@RequestBody Seller seller) {
+    public ResponseEntity<Map<String, Object>> registerSeller(
+        @Parameter(description = "Seller registration data including business information", required = true)
+        @RequestBody Seller seller) {
         Map<String, Object> response = new HashMap<>();
 
         try {
@@ -487,9 +539,22 @@ public class UserController {
         }
     }
 
-    // JWT-authenticated endpoint for updating user information
+    @Operation(
+        summary = "Update user information",
+        description = "Update current user's personal information including contact details and address. Requires JWT authentication.",
+        security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "User information updated successfully"),
+        @ApiResponse(responseCode = "401", description = "User not authenticated"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/update-info")
-    public ResponseEntity<?> updateUserInfo(@RequestBody Map<String, String> userInfo, HttpServletRequest request) {
+    public ResponseEntity<?> updateUserInfo(
+        @Parameter(description = "User information to update", required = true)
+        @RequestBody Map<String, String> userInfo,
+        HttpServletRequest request) {
         try {
             System.out.println("=== UPDATE USER INFO ENDPOINT CALLED ===");
 

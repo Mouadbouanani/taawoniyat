@@ -21,7 +21,6 @@ import { useRouter } from 'expo-router';
 import { Image as ExpoImage } from 'expo-image';
 import { ProductData } from '@/components/ProductCard';
 import * as ImagePicker from 'expo-image-picker';
-import { Header } from '@/components/ui/Header';
 
 // Updated interfaces to match backend structure
 export interface PanierItem {
@@ -35,21 +34,10 @@ export interface Order {
   panier_id: number;
   date: string;
   items: PanierItem[];
-  client?: {
+  client: {
     id: number;
     fullName: string;
     email: string;
-    phone?: string;
-    address?: string;
-    city?: string;
-    region?: string;
-  };
-  seller?: {
-    id: number;
-    fullName: string;
-    email: string;
-    phone?: string;
-    businessName?: string;
   };
 }
 
@@ -125,23 +113,18 @@ export default function AccountScreen() {
 
   const fetchClientOrders = async (): Promise<Order[]> => {
     try {
-      console.log('Fetching client orders using authService...');
-      const clientOrders = await authService.getClientOrders();
-      console.log('Fetched client orders:', clientOrders);
-
-      // Transform the data to match our Order interface
-      const transformedOrders: Order[] = clientOrders.map((order: any) => {
-        console.log('Processing client order:', order);
-        return {
-          panier_id: order.panier_id || order.id,
-          date: order.date || order.orderDate,
-          items: order.rawItems || order.items || [],
-          client: order.client || { id: 0, fullName: '', email: '' }
-        };
-      });
-
-      console.log('Transformed client orders:', transformedOrders);
-      return transformedOrders;
+      const response = await fetch('http://localhost:8080/panier/history');
+      if (response.ok) {
+        const allOrders = await response.json();
+        // Filter orders that belong to the current client
+        const clientOrders = allOrders.filter((order: Order) =>
+          order.client && order.client.email === user?.email
+        );
+        return clientOrders;
+      } else {
+        console.error('Failed to fetch client orders:', response.status);
+        return [];
+      }
     } catch (error) {
       console.error('Error fetching client orders:', error);
       return [];
@@ -150,23 +133,17 @@ export default function AccountScreen() {
 
   const fetchSellerOrders = async (): Promise<Order[]> => {
     try {
-      console.log('Fetching seller orders using JWT endpoint...');
-      const sellerOrders = await authService.getSellerOrders();
-      console.log('Fetched seller orders:', sellerOrders);
-
-      // Transform the data to match our Order interface
-      const transformedOrders: Order[] = sellerOrders.map((order: any) => {
-        console.log('Processing seller order:', order);
-        return {
-          panier_id: order.orderId || order.panier_id,
-          date: order.orderDate || order.date,
-          items: order.items || [],
-          client: order.client || { id: 0, fullName: '', email: '' }
-        };
-      });
-
-      console.log('Transformed seller orders:', transformedOrders);
-      return transformedOrders;
+      const response = await fetch('http://localhost:8080/panier/history');
+      if (response.ok) {
+        const allOrders = await response.json();
+        // Filter orders that contain products from this seller
+        return allOrders.filter((order: Order) =>
+          order.items.some(item => item.product.sellerFullName === user?.fullName)
+        );
+      } else {
+        console.error('Failed to fetch seller orders:', response.status);
+        return [];
+      }
     } catch (error) {
       console.error('Error fetching seller orders:', error);
       return [];
@@ -176,8 +153,7 @@ export default function AccountScreen() {
   const handleLogout = async () => {
     try {
       await logout();
-      // Redirect to shop page after logout
-      router.replace('/(tabs)/shop');
+      router.replace('/Account/login');
     } catch (error) {
       console.error('Logout error:', error);
       Alert.alert('Error', 'Failed to logout');
@@ -192,7 +168,7 @@ export default function AccountScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#008080" />
+        <ActivityIndicator size="large" color="#8B4513" />
         <ThemedText style={styles.loadingText}>Loading account data...</ThemedText>
       </View>
     );
@@ -206,7 +182,7 @@ export default function AccountScreen() {
       <Ionicons
         name={icon as any}
         size={20}
-        color={activeTab === tab ? '#FFFFFF' : '#008080'}
+        color={activeTab === tab ? '#FFF8DC' : '#8B4513'}
       />
       <Text style={[styles.tabButtonText, activeTab === tab && styles.activeTabButtonText]}>
         {label}
@@ -216,31 +192,26 @@ export default function AccountScreen() {
 
   return (
     <View style={styles.container}>
-      <Header
-        title="Account"
-        showBack={false}
-        rightComponent={
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <View style={styles.userInfo}>
+            <View style={styles.avatarContainer}>
+              <Ionicons name="person-circle" size={60} color="#8B4513" />
+            </View>
+            <View style={styles.userDetails}>
+              <ThemedText style={styles.userName}>{user?.fullName}</ThemedText>
+              <ThemedText style={styles.userRole}>
+                {user?.role === 'seller' ? 'Seller' : 'Client'}
+              </ThemedText>
+              {user?.role === 'seller' && user?.businessName && (
+                <ThemedText style={styles.businessName}>{user.businessName}</ThemedText>
+              )}
+            </View>
+          </View>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Ionicons name="log-out-outline" size={24} color="#ff4444" />
           </TouchableOpacity>
-        }
-      />
-
-      {/* User Info Section */}
-      <View style={styles.userInfoSection}>
-        <View style={styles.userInfo}>
-          <View style={styles.avatarContainer}>
-            <Ionicons name="person-circle" size={50} color="#008080" />
-          </View>
-          <View style={styles.userDetails}>
-            <ThemedText style={styles.userName}>{user?.fullName}</ThemedText>
-            <ThemedText style={styles.userRole}>
-              {user?.role === 'seller' ? 'Seller' : 'Client'}
-            </ThemedText>
-            {user?.role === 'seller' && user?.businessName && (
-              <ThemedText style={styles.businessName}>{user.businessName}</ThemedText>
-            )}
-          </View>
         </View>
       </View>
 
@@ -283,7 +254,7 @@ export default function AccountScreen() {
                 style={styles.addButton}
                 onPress={() => setShowAddProductModal(true)}
               >
-                <Ionicons name="add-circle" size={24} color="#008080" />
+                <Ionicons name="add-circle" size={24} color="#8B4513" />
                 <Text style={styles.addButtonText}>Add Product</Text>
               </TouchableOpacity>
             </View>
@@ -328,7 +299,7 @@ export default function AccountScreen() {
               <FlatList
                 data={orders}
                 keyExtractor={(item) => item.panier_id.toString()}
-                renderItem={({ item }) => <OrderCard order={item} userRole={user?.role} />}
+                renderItem={({ item }) => <OrderCard order={item} />}
                 showsVerticalScrollIndicator={false}
               />
             )}
@@ -405,13 +376,13 @@ function ProductItem({ product, onRefresh }: { product: ProductData; onRefresh: 
         <ThemedText style={styles.productDescription} numberOfLines={2}>
           {product.description}
         </ThemedText>
-        <ThemedText style={styles.productPrice}>{product.price.toFixed(2)} DH</ThemedText>
+        <ThemedText style={styles.productPrice}>${product.price.toFixed(2)}</ThemedText>
         <ThemedText style={styles.productStock}>Stock: {product.quantity}</ThemedText>
         <ThemedText style={styles.productCategory}>Category: {product.category}</ThemedText>
       </View>
       <View style={styles.productActions}>
         <TouchableOpacity style={styles.editButton} onPress={() => router.push(`/(modal)/edit-product/${product.id}`)}>
-          <Ionicons name="create-outline" size={20} color="#008080" />
+          <Ionicons name="create-outline" size={20} color="#8B4513" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteProduct}>
           <Ionicons name="trash-outline" size={20} color="#ff4444" />
@@ -421,7 +392,7 @@ function ProductItem({ product, onRefresh }: { product: ProductData; onRefresh: 
   );
 }
 
-function OrderCard({ order, userRole }: { order: Order; userRole?: string }) {
+function OrderCard({ order }: { order: Order }) {
   const calculateTotal = () => {
     return order.items.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
@@ -435,28 +406,10 @@ function OrderCard({ order, userRole }: { order: Order; userRole?: string }) {
         </ThemedText>
       </View>
 
-      {/* Show client info for sellers, seller info for clients */}
-      {userRole === 'seller' && order.client && (
+      {order.client && (
         <View style={styles.clientInfo}>
-          <ThemedText style={styles.clientInfoTitle}>Customer Information:</ThemedText>
-          <View style={styles.clientDetails}>
-            <ThemedText style={styles.clientName}>Name: {order.client.fullName}</ThemedText>
-            <ThemedText style={styles.clientContact}>Email: {order.client.email}</ThemedText>
-            <ThemedText style={styles.clientContact}>Phone: {order.client.phone}</ThemedText>
-            <ThemedText style={styles.clientAddress}>
-              Address: {order.client.address}, {order.client.city}, {order.client.region}
-            </ThemedText>
-          </View>
-        </View>
-      )}
-
-      {userRole === 'client' && order.items.length > 0 && (
-        <View style={styles.clientInfo}>
-          <ThemedText style={styles.clientInfoTitle}>Seller Information:</ThemedText>
-          <View style={styles.clientDetails}>
-            <ThemedText style={styles.clientName}>Seller: {order.items[0].product.sellerFullName}</ThemedText>
-            <ThemedText style={styles.clientContact}>Business: {order.items[0].product.sellerFullName}</ThemedText>
-          </View>
+          <ThemedText style={styles.clientName}>Customer: {order.client.fullName}</ThemedText>
+          <ThemedText style={styles.clientEmail}>{order.client.email}</ThemedText>
         </View>
       )}
 
@@ -466,11 +419,11 @@ function OrderCard({ order, userRole }: { order: Order; userRole?: string }) {
             <View style={styles.orderItemInfo}>
               <ThemedText style={styles.orderItemName}>{item.product.name}</ThemedText>
               <ThemedText style={styles.orderItemDetails}>
-                Qty: {item.quantity} × {item.price.toFixed(2)} DH
+                Qty: {item.quantity} × ${item.price.toFixed(2)}
               </ThemedText>
             </View>
             <ThemedText style={styles.orderItemTotal}>
-              {(item.price * item.quantity).toFixed(2)} DH
+              ${(item.price * item.quantity).toFixed(2)}
             </ThemedText>
           </View>
         ))}
@@ -478,7 +431,7 @@ function OrderCard({ order, userRole }: { order: Order; userRole?: string }) {
 
       <View style={styles.orderFooter}>
         <ThemedText style={styles.orderTotal}>
-          Total: {calculateTotal().toFixed(2)} DH
+          Total: ${calculateTotal().toFixed(2)}
         </ThemedText>
       </View>
     </View>
@@ -597,7 +550,7 @@ function AddProductModal({ visible, onClose, onProductAdded }: {
         <View style={styles.modalHeader}>
           <ThemedText style={styles.modalTitle}>Add New Product</ThemedText>
           <TouchableOpacity onPress={onClose}>
-            <Ionicons name="close" size={24} color="#008080" />
+            <Ionicons name="close" size={24} color="#8B4513" />
           </TouchableOpacity>
         </View>
 
@@ -625,7 +578,7 @@ function AddProductModal({ visible, onClose, onProductAdded }: {
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={styles.inputLabel}>Price (DH)</ThemedText>
+            <ThemedText style={styles.inputLabel}>Price ($)</ThemedText>
             <TextInput
               style={styles.textInput}
               value={productData.price}
@@ -672,7 +625,7 @@ function AddProductModal({ visible, onClose, onProductAdded }: {
           <View style={styles.inputGroup}>
             <ThemedText style={styles.inputLabel}>Product Images (Optional)</ThemedText>
             <TouchableOpacity style={styles.imagePickerButton} onPress={pickImages}>
-              <Ionicons name="camera-outline" size={24} color="#008080" />
+              <Ionicons name="camera-outline" size={24} color="#8B4513" />
               <Text style={styles.imagePickerText}>
                 {selectedImages.length > 0
                   ? `${selectedImages.length} image(s) selected`
@@ -713,7 +666,7 @@ function AddProductModal({ visible, onClose, onProductAdded }: {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator color="#FFF8DC" />
             ) : (
               <Text style={styles.submitButtonText}>Add Product</Text>
             )}
@@ -727,25 +680,36 @@ function AddProductModal({ visible, onClose, onProductAdded }: {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#f8f9fa',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#f8f9fa',
   },
   loadingText: {
     marginTop: 16,
-    color: '#008080',
+    color: '#8B4513',
     fontSize: 16,
   },
-  userInfoSection: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+  header: {
+    backgroundColor: '#FFF8DC',
+    paddingTop: 60,
+    paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#D2B48C',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
   },
   userInfo: {
     flexDirection: 'row',
@@ -761,18 +725,18 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#111827',
+    color: '#8B4513',
   },
   userRole: {
     fontSize: 16,
-    color: '#008080',
+    color: '#8B4513',
     opacity: 0.8,
     marginTop: 2,
   },
   businessName: {
     fontSize: 14,
-    color: '#6B7280',
-    opacity: 0.8,
+    color: '#8B4513',
+    opacity: 0.6,
     marginTop: 2,
   },
   logoutButton: {
@@ -793,16 +757,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   activeTabButton: {
-    backgroundColor: '#008080',
+    backgroundColor: '#8B4513',
   },
   tabButtonText: {
     marginLeft: 8,
     fontSize: 14,
     fontWeight: '500',
-    color: '#008080',
+    color: '#8B4513',
   },
   activeTabButtonText: {
-    color: '#FFFFFF',
+    color: '#FFF8DC',
   },
   content: {
     flex: 1,
@@ -821,7 +785,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#008080',
+    color: '#8B4513',
     marginBottom: 16,
   },
   sectionHeader: {
@@ -842,7 +806,7 @@ const styles = StyleSheet.create({
   infoLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#008080',
+    color: '#8B4513',
     width: 120,
   },
   infoValue: {
@@ -853,16 +817,16 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0FDFA',
+    backgroundColor: '#FFF8DC',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#008080',
+    borderColor: '#8B4513',
   },
   addButtonText: {
     marginLeft: 8,
-    color: '#008080',
+    color: '#8B4513',
     fontWeight: '600',
   },
   emptyState: {
@@ -926,7 +890,7 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#008080',
+    color: '#8B4513',
     marginBottom: 4,
   },
   productStock: {
@@ -948,7 +912,7 @@ const styles = StyleSheet.create({
   editButton: {
     padding: 8,
     borderRadius: 6,
-    backgroundColor: '#F0FDFA',
+    backgroundColor: '#e6f3ff',
   },
   deleteButton: {
     padding: 8,
@@ -977,7 +941,7 @@ const styles = StyleSheet.create({
   orderId: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#008080',
+    color: '#8B4513',
   },
   orderDate: {
     fontSize: 14,
@@ -998,24 +962,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     marginTop: 2,
-  },
-  clientInfoTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#008080',
-    marginBottom: 8,
-  },
-  clientDetails: {
-    gap: 4,
-  },
-  clientContact: {
-    fontSize: 12,
-    color: '#666',
-  },
-  clientAddress: {
-    fontSize: 12,
-    color: '#666',
-    fontStyle: 'italic',
   },
   orderItems: {
     marginBottom: 12,
@@ -1044,7 +990,7 @@ const styles = StyleSheet.create({
   orderItemTotal: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#008080',
+    color: '#8B4513',
   },
   orderFooter: {
     borderTopWidth: 1,
@@ -1054,13 +1000,13 @@ const styles = StyleSheet.create({
   orderTotal: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#008080',
+    color: '#8B4513',
     textAlign: 'right',
   },
   // Modal styles
   modalContainer: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#f8f9fa',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -1068,14 +1014,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     paddingTop: 60,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF8DC',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#D2B48C',
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#008080',
+    color: '#8B4513',
   },
   modalContent: {
     flex: 1,
@@ -1087,14 +1033,14 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#008080',
+    color: '#8B4513',
     marginBottom: 8,
   },
   textInput: {
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
-    padding: 16,
+    borderWidth: 1,
+    borderColor: '#D2B48C',
+    borderRadius: 8,
+    padding: 12,
     fontSize: 16,
     backgroundColor: '#fff',
   },
@@ -1112,24 +1058,24 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#D2B48C',
     backgroundColor: '#fff',
   },
   selectedCategoryButton: {
-    backgroundColor: '#008080',
-    borderColor: '#008080',
+    backgroundColor: '#8B4513',
+    borderColor: '#8B4513',
   },
   categoryButtonText: {
     fontSize: 14,
-    color: '#008080',
+    color: '#8B4513',
   },
   selectedCategoryButtonText: {
-    color: '#FFFFFF',
+    color: '#FFF8DC',
   },
   submitButton: {
-    backgroundColor: '#008080',
+    backgroundColor: '#8B4513',
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 8,
     alignItems: 'center',
     marginTop: 20,
   },
@@ -1137,25 +1083,24 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   submitButtonText: {
-    color: '#FFFFFF',
+    color: '#FFF8DC',
     fontSize: 16,
     fontWeight: 'bold',
   },
   imagePickerButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0FDFA',
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    borderStyle: 'dashed',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#FFF8DC',
+    borderWidth: 1,
+    borderColor: '#D2B48C',
+    borderRadius: 8,
+    padding: 12,
     marginTop: 8,
   },
   imagePickerText: {
     marginLeft: 12,
     fontSize: 16,
-    color: '#008080',
+    color: '#8B4513',
   },
   selectedImagesContainer: {
     marginTop: 12,

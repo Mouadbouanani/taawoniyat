@@ -1,5 +1,11 @@
 package esi.ma.taawoniyate.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import esi.ma.taawoniyate.model.Client;
 import esi.ma.taawoniyate.model.Panier;
 import esi.ma.taawoniyate.model.PanierItem;
@@ -27,6 +33,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/panier")
 @CrossOrigin(origins = {"http://localhost:8081", "http://localhost:8083"}, allowCredentials = "true")
+@Tag(name = "Cart Management", description = "APIs for managing shopping cart and orders")
 public class PanierController {
     @Autowired
     private PanierService panierService;
@@ -86,9 +93,24 @@ public class PanierController {
         }
     }
 
-    // JWT-authenticated endpoint for saving cart as panier
+    @Operation(
+        summary = "Save cart as order",
+        description = "Save current user's cart items as a panier (order) in the database. Works for both clients and sellers. Requires JWT authentication.",
+        security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Cart saved successfully as order"),
+        @ApiResponse(responseCode = "400", description = "Invalid cart data or empty cart"),
+        @ApiResponse(responseCode = "401", description = "User not authenticated"),
+        @ApiResponse(responseCode = "404", description = "User or product not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/save-cart")
-    public ResponseEntity<?> saveCartAsPanier(@RequestBody Map<String, Object> requestData, HttpServletRequest request) {
+    public ResponseEntity<?> saveCartAsPanier(
+        @Parameter(description = "Cart data with items to save", required = true,
+                  example = "{\"items\": [{\"productId\": 1, \"quantity\": 2, \"price\": 29.99}]}")
+        @RequestBody Map<String, Object> requestData,
+        HttpServletRequest request) {
         try {
             System.out.println("=== SAVE CART AS PANIER ENDPOINT CALLED ===");
             System.out.println("Request data: " + requestData);
@@ -208,7 +230,17 @@ public class PanierController {
         }
     }
 
-    // Get client orders (for clients to see their order history)
+    @Operation(
+        summary = "Get client order history",
+        description = "Retrieve order history for the current authenticated user. Works for both clients and sellers to see their purchase history. Requires JWT authentication.",
+        security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Order history retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "User not authenticated"),
+        @ApiResponse(responseCode = "404", description = "User not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/client-orders")
     public ResponseEntity<?> getClientOrders(HttpServletRequest request) {
         try {
@@ -247,7 +279,16 @@ public class PanierController {
         }
     }
 
-    // Get seller orders (for sellers to see orders containing their products)
+    @Operation(
+        summary = "Get seller orders",
+        description = "Retrieve orders containing products from the current authenticated seller. Shows customer information and order details for products sold by this seller. Requires JWT authentication.",
+        security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Seller orders retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "User not authenticated"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/seller-orders")
     public ResponseEntity<?> getSellerOrders(HttpServletRequest request) {
         try {

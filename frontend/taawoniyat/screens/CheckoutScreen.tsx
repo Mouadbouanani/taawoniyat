@@ -8,12 +8,13 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
-import { ThemedText } from '@/components/ThemedText';
+import { Typography } from '@/components/ui/Typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useUser } from '@/contexts/UserContext';
 import { authService } from '@/services/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { designSystem } from '@/theme/designSystem';
 
 interface UserInfo {
   fullName: string;
@@ -95,8 +96,9 @@ export default function CheckoutScreen() {
       const success = await authService.updateUserInfo(userInfo);
 
       if (success) {
-        // Get cart items from AsyncStorage
-        const cartData = await AsyncStorage.getItem('cartItems');
+        // Get user-specific cart items from AsyncStorage
+        const cartKey = user?.id ? `cartItems_${user.id}` : 'cartItems_guest';
+        const cartData = await AsyncStorage.getItem(cartKey);
         const cartItems = cartData ? JSON.parse(cartData) : [];
 
         if (cartItems.length > 0) {
@@ -104,8 +106,8 @@ export default function CheckoutScreen() {
           const cartSaved = await authService.saveCartAsPanier(cartItems);
 
           if (cartSaved) {
-            // Clear cart from AsyncStorage after successful save
-            await AsyncStorage.removeItem('cartItems');
+            // Clear user-specific cart from AsyncStorage after successful save
+            await AsyncStorage.removeItem(cartKey);
 
             Alert.alert('Success', 'Order placed successfully! Your cart has been saved and cleared.', [
               {
@@ -159,64 +161,64 @@ export default function CheckoutScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#8B4513" />
+          <Ionicons name="arrow-back" size={24} color={designSystem.colors.primary[600]} />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Checkout</ThemedText>
+        <Typography variant="h3" style={styles.headerTitle}>Checkout</Typography>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Delivery Information</ThemedText>
-          <ThemedText style={styles.sectionSubtitle}>
+          <Typography variant="h4" style={styles.sectionTitle}>Delivery Information</Typography>
+          <Typography variant="body2" style={styles.sectionSubtitle}>
             Please review and update your delivery information
-          </ThemedText>
+          </Typography>
         </View>
 
         <View style={styles.formContainer}>
           <View style={styles.inputGroup}>
-            <ThemedText style={styles.label}>Full Name *</ThemedText>
+            <Typography variant="body2" style={styles.label}>Full Name *</Typography>
             <TextInput
               style={styles.input}
               value={userInfo.fullName}
               onChangeText={(value) => handleInputChange('fullName', value)}
               placeholder="Enter your full name"
-              placeholderTextColor="#999"
+              placeholderTextColor={designSystem.colors.neutral[400]}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={styles.label}>Email *</ThemedText>
+            <Typography variant="body2" style={styles.label}>Email *</Typography>
             <TextInput
               style={styles.input}
               value={userInfo.email}
               onChangeText={(value) => handleInputChange('email', value)}
               placeholder="Enter your email"
-              placeholderTextColor="#999"
+              placeholderTextColor={designSystem.colors.neutral[400]}
               keyboardType="email-address"
               autoCapitalize="none"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={styles.label}>Phone Number *</ThemedText>
+            <Typography variant="body2" style={styles.label}>Phone Number *</Typography>
             <TextInput
               style={styles.input}
               value={userInfo.phone}
               onChangeText={(value) => handleInputChange('phone', value)}
               placeholder="Enter your phone number"
-              placeholderTextColor="#999"
+              placeholderTextColor={designSystem.colors.neutral[400]}
               keyboardType="phone-pad"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={styles.label}>Address *</ThemedText>
+            <Typography variant="body2" style={styles.label}>Address *</Typography>
             <TextInput
               style={[styles.input, styles.textArea]}
               value={userInfo.address}
               onChangeText={(value) => handleInputChange('address', value)}
               placeholder="Enter your full address"
-              placeholderTextColor="#999"
+              placeholderTextColor={designSystem.colors.neutral[400]}
               multiline
               numberOfLines={3}
             />
@@ -224,34 +226,34 @@ export default function CheckoutScreen() {
 
           <View style={styles.row}>
             <View style={[styles.inputGroup, styles.halfWidth]}>
-              <ThemedText style={styles.label}>City *</ThemedText>
+              <Typography variant="body2" style={styles.label}>City *</Typography>
               <TextInput
                 style={styles.input}
                 value={userInfo.city}
                 onChangeText={(value) => handleInputChange('city', value)}
                 placeholder="City"
-                placeholderTextColor="#999"
+                placeholderTextColor={designSystem.colors.neutral[400]}
               />
             </View>
 
             <View style={[styles.inputGroup, styles.halfWidth]}>
-              <ThemedText style={styles.label}>Region *</ThemedText>
+              <Typography variant="body2" style={styles.label}>Region *</Typography>
               <TextInput
                 style={styles.input}
                 value={userInfo.region}
                 onChangeText={(value) => handleInputChange('region', value)}
                 placeholder="Region"
-                placeholderTextColor="#999"
+                placeholderTextColor={designSystem.colors.neutral[400]}
               />
             </View>
           </View>
         </View>
 
         <View style={styles.noteContainer}>
-          <Ionicons name="information-circle-outline" size={20} color="#666" />
-          <ThemedText style={styles.noteText}>
+          <Ionicons name="information-circle-outline" size={20} color={designSystem.colors.info[500]} />
+          <Typography variant="body2" style={styles.noteText}>
             Your information will be saved for future orders
-          </ThemedText>
+          </Typography>
         </View>
       </ScrollView>
 
@@ -266,7 +268,7 @@ export default function CheckoutScreen() {
           ) : (
             <>
               <Ionicons name="checkmark" size={20} color="#fff" />
-              <ThemedText style={styles.saveButtonText}>Save & Continue</ThemedText>
+              <Typography variant="button" style={styles.saveButtonText}>Save & Continue</Typography>
             </>
           )}
         </TouchableOpacity>
@@ -278,65 +280,62 @@ export default function CheckoutScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: designSystem.colors.neutral[50],
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
+    paddingHorizontal: designSystem.spacing.md,
+    paddingVertical: designSystem.spacing.md,
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: designSystem.colors.neutral[200],
+    ...designSystem.shadows.sm,
   },
   backButton: {
-    marginRight: 16,
+    marginRight: designSystem.spacing.md,
+    padding: designSystem.spacing.xs,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    color: designSystem.colors.neutral[800],
   },
   content: {
     flex: 1,
   },
   section: {
-    padding: 16,
-    backgroundColor: '#fff',
-    marginBottom: 8,
+    padding: designSystem.spacing.md,
+    backgroundColor: '#FFFFFF',
+    marginBottom: designSystem.spacing.sm,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
+    color: designSystem.colors.neutral[800],
+    marginBottom: designSystem.spacing.xs,
   },
   sectionSubtitle: {
-    fontSize: 14,
-    color: '#666',
+    color: designSystem.colors.neutral[600],
   },
   formContainer: {
-    backgroundColor: '#fff',
-    padding: 16,
-    marginBottom: 8,
+    backgroundColor: '#FFFFFF',
+    padding: designSystem.spacing.md,
+    marginBottom: designSystem.spacing.sm,
   },
   inputGroup: {
-    marginBottom: 16,
+    marginBottom: designSystem.spacing.md,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+    color: designSystem.colors.neutral[700],
+    marginBottom: designSystem.spacing.xs,
+    fontWeight: designSystem.typography.weights.medium,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    fontSize: 16,
-    backgroundColor: '#fff',
+    borderColor: designSystem.colors.neutral[300],
+    borderRadius: designSystem.borderRadius.md,
+    paddingHorizontal: designSystem.spacing.md,
+    paddingVertical: designSystem.spacing.sm,
+    fontSize: designSystem.typography.sizes.base,
+    backgroundColor: '#FFFFFF',
+    color: designSystem.colors.neutral[800],
   },
   textArea: {
     height: 80,
@@ -352,37 +351,39 @@ const styles = StyleSheet.create({
   noteContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: designSystem.colors.info[50],
+    padding: designSystem.spacing.md,
+    marginBottom: designSystem.spacing.md,
+    borderRadius: designSystem.borderRadius.md,
+    borderWidth: 1,
+    borderColor: designSystem.colors.info[200],
   },
   noteText: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: '#666',
+    marginLeft: designSystem.spacing.sm,
+    color: designSystem.colors.info[700],
     flex: 1,
   },
   footer: {
-    backgroundColor: '#fff',
-    padding: 16,
+    backgroundColor: '#FFFFFF',
+    padding: designSystem.spacing.md,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: designSystem.colors.neutral[200],
+    ...designSystem.shadows.sm,
   },
   saveButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#8B4513',
-    paddingVertical: 16,
-    borderRadius: 12,
+    backgroundColor: designSystem.colors.primary[500],
+    paddingVertical: designSystem.spacing.md,
+    borderRadius: designSystem.borderRadius.lg,
+    ...designSystem.shadows.md,
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: designSystem.colors.neutral[400],
   },
   saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: 8,
+    color: '#FFFFFF',
+    marginLeft: designSystem.spacing.sm,
   },
 });

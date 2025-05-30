@@ -1,5 +1,11 @@
 package esi.ma.taawoniyate.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import esi.ma.taawoniyate.model.*;
 import esi.ma.taawoniyate.repository.CategoryRepository;
 import esi.ma.taawoniyate.repository.ProductImageRepository;
@@ -26,6 +32,7 @@ import static esi.ma.taawoniyate.controller.UserController.session;
 @RestController
 @RequestMapping("/api/products")
 @CrossOrigin(origins = "http://localhost:8081",allowCredentials = "true")
+@Tag(name = "Product Management", description = "APIs for managing products, images, and favorites")
 public class ProductController {
 
     private final CloudinaryService cloudinaryService;
@@ -193,7 +200,19 @@ public class ProductController {
         return ResponseEntity.ok(result);
     }
 
-    // JWT-authenticated endpoint for adding products with images
+    @Operation(
+        summary = "Add product with images (JWT)",
+        description = "Add a new product with multiple images. Only sellers can add products. Requires JWT authentication.",
+        security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Product added successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data or missing required fields"),
+        @ApiResponse(responseCode = "401", description = "User not authenticated"),
+        @ApiResponse(responseCode = "403", description = "Access denied - only sellers can add products"),
+        @ApiResponse(responseCode = "404", description = "Category or seller not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/add-with-images-jwt")
     public ResponseEntity<?> addProductWithImagesJWT(
             @RequestParam("name") String name,
@@ -294,9 +313,23 @@ public class ProductController {
         }
     }
 
-    // JWT-authenticated endpoint for deleting products
+    @Operation(
+        summary = "Delete product",
+        description = "Delete a product by ID. Only the seller who owns the product can delete it. Requires JWT authentication.",
+        security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Product deleted successfully"),
+        @ApiResponse(responseCode = "401", description = "User not authenticated"),
+        @ApiResponse(responseCode = "403", description = "Access denied - only product owner can delete"),
+        @ApiResponse(responseCode = "404", description = "Product not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @DeleteMapping("/{productId}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long productId, HttpServletRequest request) {
+    public ResponseEntity<?> deleteProduct(
+        @Parameter(description = "ID of the product to delete", required = true)
+        @PathVariable Long productId,
+        HttpServletRequest request) {
         try {
             System.out.println("=== DELETE PRODUCT ENDPOINT CALLED ===");
             System.out.println("Product ID: " + productId);

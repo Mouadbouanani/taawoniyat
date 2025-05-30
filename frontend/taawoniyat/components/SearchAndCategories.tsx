@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TextInput, ScrollView, TouchableOpacity } from 'react-native';
-import { ThemedText } from '../components/ThemedText';
+import { Typography } from './ui/Typography';
 import { Ionicons } from '@expo/vector-icons';
+import { designSystem } from '@/theme/designSystem';
 
 interface SearchAndCategoriesProps {
   onSearch: (query: string) => void;
@@ -57,13 +58,13 @@ export function SearchAndCategories({ onSearch, onCategorySelect }: SearchAndCat
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#8B4513" style={styles.searchIcon} />
+        <Ionicons name="search" size={20} color={designSystem.colors.primary[600]} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search Moroccan products..."
           value={searchQuery}
           onChangeText={handleSearch}
-          placeholderTextColor="#8B4513"
+          placeholderTextColor={designSystem.colors.neutral[500]}
         />
       </View>
 
@@ -71,6 +72,7 @@ export function SearchAndCategories({ onSearch, onCategorySelect }: SearchAndCat
         horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.categoriesContainer}
+        contentContainerStyle={styles.categoriesContent}
       >
         {categories.map((category, index) => (
           <TouchableOpacity
@@ -81,14 +83,13 @@ export function SearchAndCategories({ onSearch, onCategorySelect }: SearchAndCat
             ]}
             onPress={() => handleCategorySelect(category)}
           >
-            <ThemedText
-              style={[
-                styles.categoryText,
-                selectedCategory === category && styles.selectedCategoryText
-              ]}
+            <Typography
+              variant="body2"
+              color={selectedCategory === category ? '#FFFFFF' : designSystem.colors.primary[600]}
+              style={styles.categoryText}
             >
               {category}
-            </ThemedText>
+            </Typography>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -98,61 +99,55 @@ export function SearchAndCategories({ onSearch, onCategorySelect }: SearchAndCat
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: '#FDF5E6', // Light cream color
+    padding: designSystem.spacing.md,
+    backgroundColor: designSystem.colors.neutral[50],
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF8DC', // Cornsilk color
-    borderRadius: 25,
-    paddingHorizontal: 16,
-    marginBottom: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: designSystem.borderRadius.lg,
+    paddingHorizontal: designSystem.spacing.md,
+    marginBottom: designSystem.spacing.md,
     borderWidth: 1,
-    borderColor: '#D2B48C', // Tan color
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderColor: designSystem.colors.primary[200],
+    ...designSystem.shadows.md,
   },
   searchIcon: {
-    marginRight: 8,
+    marginRight: designSystem.spacing.sm,
   },
   searchInput: {
     flex: 1,
-    height: 45,
-    fontSize: 16,
-    color: '#8B4513', // Saddle brown color
+    height: 48,
+    fontSize: designSystem.typography.sizes.base,
+    color: designSystem.colors.neutral[700],
+    fontWeight: designSystem.typography.weights.regular,
   },
   categoriesContainer: {
     flexDirection: 'row',
-    marginBottom: 8,
+  },
+  categoriesContent: {
+    paddingRight: designSystem.spacing.md,
   },
   categoryButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    marginRight: 10,
-    borderRadius: 25,
-    backgroundColor: '#FFF8DC', // Cornsilk color
+    paddingHorizontal: designSystem.spacing.lg,
+    paddingVertical: designSystem.spacing.sm + 4,
+    marginRight: designSystem.spacing.sm + 2,
+    borderRadius: designSystem.borderRadius.full,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#D2B48C', // Tan color
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    borderColor: designSystem.colors.primary[300],
+    ...designSystem.shadows.sm,
+    minHeight: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   selectedCategory: {
-    backgroundColor: '#8B4513', // Saddle brown color
-    borderColor: '#8B4513',
+    backgroundColor: designSystem.colors.primary[500],
+    borderColor: designSystem.colors.primary[500],
+    ...designSystem.shadows.md,
   },
   categoryText: {
-    fontSize: 14,
-    color: '#8B4513', // Saddle brown color
-    fontWeight: '500',
-  },
-  selectedCategoryText: {
-    color: '#FFF8DC', // Cornsilk color
+    fontWeight: designSystem.typography.weights.medium,
   },
 });
